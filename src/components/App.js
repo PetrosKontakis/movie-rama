@@ -1,11 +1,19 @@
 import React from 'react';
 
+import Header from './header/header.component';
+import MovieListContainer from './movie-list-container/movieListContainer.component';
 
+
+/**
+ * Name: App
+ * Description: App is main component 
+ */
 function App() {
   return (
-    <div className="App">
-      <h1>MovieRama</h1>
-    </div>
+    <React.Fragment>
+        <Header></Header>
+        <MovieListContainer></MovieListContainer>
+    </React.Fragment>
   );
 }
 
