@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import MovieListItem from '../movie-list-item/movieListItem.component';
-import { getNowPlayingMoviesPaged, getGenreList } from '../../services/httpActions.service';
+import { getNowPlayingMoviesPaged, getGenreList, searchMovie } from '../../services/httpActions.service';
 
 /**
  * Available view states
@@ -18,6 +18,8 @@ const INITIAL_STATE = {
     errorMessage: '',
     currentPage: 1,
     totalPages: null,
+    totalResults: null,
+    query: '',
     genreList: [],
     movies: []
 }
@@ -34,36 +36,71 @@ class MovieListContainer extends Component {
     //  Set up initial state
     state = INITIAL_STATE;
 
+
     // On component mount execute http request
     componentDidMount() {
         this.getMovies();
         this.getGenreList();
     }
 
-    getGenreList = () =>{
-        getGenreList().then((response)=> {
-            this.setState({genresList: response.genres})
+    componentWillReceiveProps(nextProps) {
+
+
+        if (nextProps.query != null) {
+
+            let newState = {
+
+                ...INITIAL_STATE,
+                viewState: VIEW_STATES.SEARCH_VIEW,
+                query: nextProps.query
+            }
+
+            this.setState(newState, () => this.getMovies());
+        } else {
+            this.setState(INITIAL_STATE, () => this.getMovies());
+        }
+
+
+    }
+
+    getGenreList = () => {
+        getGenreList().then((response) => {
+            this.setState({ genresList: response.genres })
         })
     }
     // This function execute http request
     getMovies = () => {
+
         this.setState({ loading: true });
-        getNowPlayingMoviesPaged(this.state.currentPage)
-            .then((response) => {
-                const movies = [...this.state.movies, ...response.results];
-                this.setState({
-                    movies,
-                    loading: false,
-                    totalPages: response.total_pages
-                })
-            })
-            .catch((error) => {
-                this.setState({
-                    viewState: VIEW_STATES.SERVER_ERROR,
-                    loading: false,
-                    error: error.error
-                })
-            })
+
+        if (this.state.query) {
+            searchMovie(this.state.query, this.state.currentPage)
+                .then(this.handleGetMoviesSuccess)
+                .catch(this.handleGetMoviesError)
+        } else {
+            getNowPlayingMoviesPaged(this.state.currentPage)
+                .then(this.handleGetMoviesSuccess)
+                .catch(this.handleGetMoviesError)
+        }
+
+    }
+    
+    handleGetMoviesSuccess = response => {
+        const movies = [...this.state.movies, ...response.results];
+        this.setState({
+            movies,
+            loading: false,
+            totalResults: response.total_results,
+            totalPages: response.total_pages
+        })
+    }
+
+    handleGetMoviesError = error => {
+        this.setState({
+            viewState: VIEW_STATES.SERVER_ERROR,
+            loading: false,
+            error: error.error
+        })
     }
 
     //  Increase currentPage and execute http getMovies
@@ -88,17 +125,22 @@ class MovieListContainer extends Component {
         this.getNextPage();
     }
 
-
     render() {
 
-        const { loading, movies, viewState, genreList } = this.state;
+        const { loading, movies, viewState, genreList, totalResults, query } = this.state;
         return (
             <div>
 
                 <div className="movie-list-title">
                     <h4>
                         {viewState === VIEW_STATES.NOW_PLAYING_VIEW ? 'Now In Theaters' : 'Search results'}
+
                     </h4>
+                    <h5>
+                        Query: {query}
+                        <br />
+                        Total results: {totalResults}
+                    </h5>
                 </div>
                 <div className="movie-list-container">
                     {movies.map(

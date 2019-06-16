@@ -11,14 +11,12 @@ class SearchBox extends Component {
     }
 
 
-    handleSubmit = (e) => {
-        console.log(e.targe);
-    }
+    
     handleOnChange = (e) => {
-        console.log(e.target.value);
         this.setState({
             searchQuery: e.target.value
         })
+        this.props.onQueryChange(e.target.value);
     }
 
     render(){

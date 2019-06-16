@@ -1,5 +1,4 @@
 import React from 'react';
-import SearchBox from '../search-box/searchBox.component'
 
 
 /**
@@ -14,10 +13,6 @@ const Header = (props) => {
             <h1 className="brand-name">
                 MovieRama
             </h1>
-
-            <span>
-                <SearchBox></SearchBox>
-            </span>
         </div>
     )
 }
