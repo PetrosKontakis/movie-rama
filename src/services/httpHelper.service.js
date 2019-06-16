@@ -33,6 +33,22 @@ const addNewCanceler = () => {
     return newHttpAbort.signal;
 }
 
+
+const getMatchingGroups = (endPoint) => {
+    const regex = /\{(.*?)\}/g
+    let matchingGroups = []
+    let match;
+    while (match = regex.exec(endPoint)) {
+        matchingGroups.push({
+            stringToReplace: match[0],
+            param: match[1]
+        });
+    }
+    return matchingGroups;
+};
+
+
+
 /**
  * TODO:comments
  */
@@ -48,7 +64,26 @@ const genericHttpCall = (endPoint, params = {}, options = {}) => {
         fetchOpt['signal'] = signal;
     }
 
-    // Add parameter api_key
+    //  Get parameters from endpoint that match to template {test}
+    const matchingGroups = getMatchingGroups(endPoint);
+
+    matchingGroups.forEach((group) => {
+        //  check if template parameters exist on params object input 
+        if (params[group.param]) {
+            //  Change endpoint template with the parameter actual value
+            endPoint = endPoint.replace(group.stringToReplace, params[group.param]);
+            //  Remove it for params object
+            delete params[group.param]
+            //  console.log(`Parameter: ${group.param} exist on template endpoint: ${endPoint}`)
+        }
+        else {
+            //  TODO: return promise rejection 
+            console.error(`parameter: '${group.param}' is required on request: ${endPoint}`)
+        }
+    });
+
+
+    // Add api_key parameter
     params['api_key'] = THE_MOVIE_DB_API_KEY;
     // Convert object parameters to string
     const urlParameters = getParamsAsString(params);

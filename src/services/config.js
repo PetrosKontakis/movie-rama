@@ -5,5 +5,10 @@ export const API_ROOT = 'https://api.themoviedb.org/3';
 export const API_ENDPOINTS = {
     MOVIES_NOW_PLAYING: '/movie/now_playing',
     GENRE_LIST: '/genre/movie/list',
-    SEARCH: '/search/movie'
+    SEARCH: '/search/movie',
+    MOVIE: '/movie/{movie_id}',
+    MOVIE_VIDEOS: '/movie/{movie_id}/videos',
+    MOVIE_REVIEWS: '/movie/{movie_id}/reviews',
+    MOVIE_SIMILAR: '/movie/{movie_id}/similar',
+
 }
