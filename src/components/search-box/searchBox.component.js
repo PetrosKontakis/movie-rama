@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 
-
 const DELAY = 600;
 
 /**
@@ -24,7 +23,6 @@ class SearchBox extends Component {
     handleOnChange = (e) => {
 
         clearTimeout(this.timer);
-
         this.setState({
             searchQuery: e.target.value
         }, () => this.timer = setTimeout(this.notifyOnQueryChange, DELAY))
@@ -32,7 +30,6 @@ class SearchBox extends Component {
 
     notifyOnQueryChange = () => {
         this.props.onQueryChange(this.state.searchQuery);
-
     }
 
     render() {
