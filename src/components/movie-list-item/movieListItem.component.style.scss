@@ -10,6 +10,7 @@ $poster_width: 89px;
   padding: 8px;
   box-sizing: border-box;
   overflow: hidden;
+  @include transition();
 
   &.mv-masonry-lg {
     width: 50%;
@@ -80,7 +81,6 @@ $poster_width: 89px;
     position: absolute;
     width: 100%;
     height: 100%;
-    z-index: -1;
   }
   .mv-card-content {
     background: rgba(255, 255, 255, 0.1);
@@ -96,6 +96,7 @@ $poster_width: 89px;
   }
   .mv-card-content {
     padding-top: 100px;
+    position: relative;
   }
   .mv-card-content .title {
     font-size: 32px;
@@ -110,7 +111,7 @@ $poster_width: 89px;
     opacity: 0;
     @include transition();
   }
-  &:hover {
+  &:hover{
     .mv-card-content,
     .mv-card-footer {
       opacity: 1;
@@ -130,17 +131,17 @@ $poster_width: 89px;
     background: $background-color-secondary;
   }
 
-  .mv-card-content{
+  .mv-card-content {
     opacity: 1;
   }
   .mv-card-footer {
     opacity: 0;
   }
-  
-  .mv-card-content .title{
+
+  .mv-card-content .title {
     margin-top: 16px;
   }
-  .mv-card-content .title, 
+  .mv-card-content .title,
   .mv-card-content .genre {
     height: 0;
     margin: auto;
@@ -153,5 +154,8 @@ $poster_width: 89px;
   .mv-card-content .genre {
     max-width: 35%;
   }
+}
 
+.mv-card.mv-card-full-page {
+  z-index: 100;
 }

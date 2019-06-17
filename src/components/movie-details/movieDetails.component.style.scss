@@ -1,0 +1,65 @@
+@import "../../styles/mixins";
+@import "../../styles/variables";
+.mv-details-container {
+  background: $background-color;
+  position: fixed;
+  z-index: 101;
+  overflow: auto;
+  @include shadow(0px 0px 2px 1px rgba(0, 0, 0, 0.5));
+  @include transition();
+
+}
+.mv-details-header{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background:rgba($color: white, $alpha: 0.5);
+  padding: 16px;
+  z-index: 101;
+  @include shadow(0px 0px 2px 0px rgba(0, 0, 0, 0.3));
+
+  .mv-details-header-title{
+    display: inline-block;
+    vertical-align: super;
+    font-size: 16px;
+    margin-left: 16px;
+    font-weight: 500;
+  }
+}
+.mv-details-poster {
+  width: 100%;
+  padding-top: 24%;
+  @include transition();
+  @include imageContainer();
+}
+
+.mv-details-content-card {
+  margin-bottom: 60px;
+  background: white;
+  border-radius: 2px;
+  padding: 0px;
+
+  @include transition();
+ 
+}
+
+.mv-details-movie-content {
+  opacity: 0;
+  &.show {
+    opacity: 1;
+  }
+  padding: 16px;
+
+  .poster-preview-container{
+    margin-top: -124px;
+  }
+  .sub-info{
+    color: $light-gray
+  }
+  .horizontal-container{
+    width: 100%;
+    position: relative;
+    float: left;
+  }
+}

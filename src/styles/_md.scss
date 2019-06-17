@@ -20,6 +20,13 @@
     z-index: 100;
   }
 }
+.md-button{
+  cursor: pointer;
+  border: 0;
+  color: inherit;
+  background: none;
+  padding: 0px;
+}
 
 .md-block-right {
   float: right;
@@ -36,10 +43,19 @@
   text-align: center;
 }
 
+.md-title{
+  padding: 8px;
+  font-size: 24px;
+  font-weight: 500;
+}
 .md-sub-title{
   padding: 8px;
   font-size: 16px;
   font-weight: 500;
+}
+.md-paragraph{
+  padding: 8px;
+  font-size: 14px;
 }
 
 .md-input {

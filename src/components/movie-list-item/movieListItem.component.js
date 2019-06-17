@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import './movieListItem.component.style.scss';
-import { getMovieDetails, getMovieVideos, getMovieReviews, getMovieSimilar } from '../../services/httpActions.service';
 
 
 /**
@@ -13,7 +12,8 @@ class MovieListItem extends Component {
     state = {
         genreNames: [],
         isGhostMovie: false,
-        isMoreInfoExpanded: false
+        isMoreInfoExpanded: false,
+        expandStyle: null
     }
 
     componentWillReceiveProps(nextProps) {
@@ -27,32 +27,15 @@ class MovieListItem extends Component {
         }
     }
 
-    expandMoreInfo = (e) => {
-        this.setState({ isMoreInfoExpanded: !this.state.isMoreInfoExpanded }, () => {
-            if (this.state.isMoreInfoExpanded) {
-                getMovieDetails(this.props.movie.id).then(
-                    response => console.log(response)
-                ).catch(
-                    error => console.log(error)
-                )
+    handleCardClick = (e) => {
 
-                getMovieReviews(this.props.movie.id).then(
-                    response => console.log(response)
-                ).catch(
-                    error => console.log(error)
-                )
-                getMovieVideos(this.props.movie.id).then(
-                    response => console.log(response)
-                ).catch(
-                    error => console.log(error)
-                )
-                getMovieSimilar(this.props.movie.id).then(
-                    response => console.log(response)
-                ).catch(
-                    error => console.log(error)
-                )
-            }
-        });
+
+        if (this.state.isGhostMovie) {
+            return;
+        }
+
+        this.props.onMovieSelect(this.props.movie, this.getOffset(e.currentTarget));
+
     }
 
     setGenreNames(genreList) {
@@ -94,7 +77,7 @@ class MovieListItem extends Component {
     }
 
     getGhostProperties = () => {
-        const size = this.props.size ? this.props.size: 'md'; 
+        const size = this.props.size ? this.props.size : 'md';
         return {
             ghostClass: 'mv-card-ghost',
             size: size,
@@ -104,6 +87,23 @@ class MovieListItem extends Component {
             genre: '',
             releaseDate: '',
             voteAverage: ''
+        }
+    }
+
+    getOffset = (el) => {
+        const rect = el.getBoundingClientRect();
+        // const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+        // const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollLeft = 0;
+        const scrollTop = 0;
+        
+        return {
+            top: rect.top + scrollTop,
+            left: rect.left + scrollLeft,
+            right: rect.left + scrollLeft + el.offsetWidth,
+            bottom: rect.top + scrollTop + el.offsetHeight,
+            width: el.offsetWidth,
+            height: el.offsetHeight
         }
     }
 
@@ -119,11 +119,19 @@ class MovieListItem extends Component {
             releaseDate,
             voteAverage } = this.getProps();
 
+        const { isMoreInfoExpanded, expandStyle } = this.state;
+
 
         return (
-            <div className={`mv-masonry-grid mv-masonry-${size}`} title={overview}>
+            <div
+                className={`mv-masonry-grid mv-masonry-${size}`} title={overview}>
+
+
+
                 <div
-                    className={`mv-card  mv-card-${size} ${ghostClass}`}>
+                    style={expandStyle}
+                    onClick={this.handleCardClick}
+                    className={`mv-card  mv-card-${size} ${ghostClass} ${isMoreInfoExpanded ? 'mv-card-full-page' : null}`}>
 
                     <div className="mv-card-poster"
                         style={{ backgroundImage: `url(${imgSrc})` }}>
@@ -148,7 +156,6 @@ class MovieListItem extends Component {
                         </div>
                     </div>
                 </div>
-
             </div>
         )
 

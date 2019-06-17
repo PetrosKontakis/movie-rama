@@ -38,6 +38,6 @@ export const getMovieReviews = (movie_id) => {
     return genericHttpCall(API_ENDPOINTS.MOVIE_REVIEWS, {movie_id})
 }
 
-export const getMovieSimilar = (movie_id) => {
-    return genericHttpCall(API_ENDPOINTS.MOVIE_SIMILAR, {movie_id})
+export const getMovieSimilar = (movie_id, page) => {
+    return genericHttpCall(API_ENDPOINTS.MOVIE_SIMILAR, {movie_id, page})
 }

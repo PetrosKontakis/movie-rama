@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 
 import MovieListItem from '../movie-list-item/movieListItem.component';
-import { getNowPlayingMoviesPaged, getGenreList, searchMovie } from '../../services/httpActions.service';
+import MovieDetails from '../movie-details/movieDetails.component';
+import { getNowPlayingMoviesPaged, getGenreList, searchMovie, getMovieSimilar } from '../../services/httpActions.service';
 
 
 
@@ -11,8 +12,9 @@ import { getNowPlayingMoviesPaged, getGenreList, searchMovie } from '../../servi
 const VIEW_STATES = {
     SEARCH_VIEW: 0,
     NOW_PLAYING_VIEW: 1,
-    SERVER_ERROR: 2,
-    NO_RESULTS: 3
+    SIMILAR_MOVIES_VIEW: 2,
+    SERVER_ERROR: 4,
+    NO_RESULTS: 5
 }
 
 const INITIAL_STATE = {
@@ -23,8 +25,13 @@ const INITIAL_STATE = {
     totalPages: null,
     totalResults: null,
     query: '',
+    similarMovieId: null,
     genreList: [],
-    movies: []
+    movies: [],
+    selectedMovieIndex: 0,
+    selectedMovie: null,
+    selectedMoviePosition: null
+
 }
 
 const GRID_LAYOUT_PATTERN = [
@@ -54,14 +61,25 @@ class MovieListContainer extends Component {
 
     // On component mount execute http request
     componentDidMount() {
-        this.getMovies();
-        this.getGenreList();
+        var newState = this.state;
+        console.log(this.props.similarMovieId)
+        if (this.props.similarMovieId) {
+            newState['similarMovieId'] = this.props.similarMovieId; 
+            newState['viewState'] = VIEW_STATES.SIMILAR_MOVIES_VIEW
+        }
+        this.setState(newState, ()=>{
+            this.getMovies();
+            this.getGenreList();
+        })
     }
 
     componentWillReceiveProps(nextProps) {
 
-
-        if (nextProps.query !== null && nextProps.query !== '') {
+        console.log("componentWillReceiveProps", nextProps, this.state.viewState)
+        if(this.state.viewState === VIEW_STATES.SIMILAR_MOVIES_VIEW) {
+            return;
+        }
+        if (nextProps.query != null && nextProps.query !== '') {
 
             let newState = {
 
@@ -72,6 +90,7 @@ class MovieListContainer extends Component {
 
             this.setState(newState, () => this.getMovies());
         } else {
+            console.log('componentWillReceiveProps')
             this.setState(INITIAL_STATE, () => this.getMovies());
         }
 
@@ -87,15 +106,21 @@ class MovieListContainer extends Component {
     getMovies = () => {
 
         this.setState({ loading: true });
+        console.log(this.state.viewState, VIEW_STATES)
 
-        if (this.state.query) {
+        if (this.state.viewState === VIEW_STATES.SEARCH_VIEW) {
             searchMovie(this.state.query, this.state.currentPage)
                 .then(this.handleGetMoviesSuccess)
                 .catch(this.handleGetMoviesError)
-        } else {
+        } else if(this.state.viewState === VIEW_STATES.SIMILAR_MOVIES_VIEW) {
+            getMovieSimilar(this.state.similarMovieId, this.state.currentPage)
+                .then(this.handleGetMoviesSuccess)
+                .catch(this.handleGetMoviesError)
+        }else{
             getNowPlayingMoviesPaged(this.state.currentPage)
                 .then(this.handleGetMoviesSuccess)
                 .catch(this.handleGetMoviesError)
+
         }
 
     }
@@ -148,14 +173,54 @@ class MovieListContainer extends Component {
     }
 
     getMovieSizeFromPattern = (index) => {
-
         const quotient = (index % GRID_LAYOUT_PATTERN.length);
         return GRID_LAYOUT_PATTERN[quotient];
     }
+
+    onMovieSelect = (movie, moviePosition) => {
+        this.setState({
+
+            selectedMovieIndex: this.state.selectedMovieIndex + 1,
+            selectedMovie: movie,
+            selectedMoviePosition: moviePosition
+        })
+    }
+
+    deselectMovie = () => {
+
+        this.setState({
+            selectedMovie: INITIAL_STATE.selectedMovie,
+            selectedMoviePosition: INITIAL_STATE.selectedMoviePosition
+        })
+    }
+
+    renderSelectedMovie = () => {
+        if (this.state.selectedMovie !== null) {
+            return (
+                <MovieDetails
+                    count={this.state.selectedMovieIndex}
+                    movie={this.state.selectedMovie}
+                    starterPosition={this.state.selectedMoviePosition}
+                    onMovieDetailsClose={this.deselectMovie}>
+                </MovieDetails>
+            )
+        }
+        return null;
+    }
+
     render() {
 
-        const { loading, movies, viewState, genreList, totalResults, query, error } = this.state;
+        const {
+            loading,
+            movies,
+            viewState,
+            genreList,
+            totalResults,
+            query,
+            error
+        } = this.state;
 
+        // Server error state
         if (viewState === VIEW_STATES.SERVER_ERROR) {
             return (
                 <div className="md-container">
@@ -169,7 +234,7 @@ class MovieListContainer extends Component {
                 </div>
             )
         }
-
+        // No results state
         if (viewState === VIEW_STATES.NO_RESULTS) {
             return (
                 <div className="md-container">
@@ -184,44 +249,48 @@ class MovieListContainer extends Component {
             )
         }
 
+        // Normal state
         return (
-            <div className="md-container">
+            <React.Fragment>
+                {/* Render selected movie */}
+                {this.renderSelectedMovie()}
 
-                <div className="md-sub-title">
+                <div className="md-container">
 
-                    {viewState === VIEW_STATES.NOW_PLAYING_VIEW ? 'Now In Theaters' : null}
-                    {viewState === VIEW_STATES.SEARCH_VIEW ? (
-                        <React.Fragment>
+                    <div className="md-sub-title">
+                        {viewState === VIEW_STATES.NOW_PLAYING_VIEW ? 'Now In Theaters' : null}
+                        {viewState === VIEW_STATES.SEARCH_VIEW ? (
+                            <React.Fragment>
+                                Search for '{query}' <i><small>total results: {totalResults}</small></i>
+                            </React.Fragment>
+                        ) : null}
+                    </div>
+                    <div className="movie-list-container">
+                        {movies.map(
+                            (movie, key) => {
+                                return (
+                                    <MovieListItem
+                                        onMovieSelect={this.onMovieSelect}
+                                        size={this.getMovieSizeFromPattern(key)}
+                                        movie={movie}
+                                        genreList={genreList}
+                                        key={movie.id}></MovieListItem>
+                                )
+                            }
+                        )}
 
-                            Search for '{query}' <i><small>total results: {totalResults}</small></i>
-                        </React.Fragment>
-                    ) : null}
+                        {loading ?
+                            GRID_LAYOUT_PATTERN.map((size, key) => (
+                                <MovieListItem ghostMovie={true} size={size} key={key}></MovieListItem>))
+                            : null}
+                    </div>
+
+                    <div className="">
+                        <button onClick={this.handleLoadMore}>load more</button>
+                    </div>
                 </div>
-                <div className="movie-list-container">
-                    {movies.map(
-                        (movie, key) => {
-                            return (
-                                <MovieListItem
-                                    size={this.getMovieSizeFromPattern(key)}
-                                    movie={movie}
-                                    genreList={genreList}
-                                    key={movie.id}></MovieListItem>
-                            )
-                        }
-                    )}
+            </React.Fragment>
 
-                    {loading ?
-                        GRID_LAYOUT_PATTERN.map((size, key) => (
-                            <MovieListItem ghostMovie={true} size={size} key={key}></MovieListItem>))
-                        : null}
-
-                </div>
-
-
-                <div className="">
-                    <button onClick={this.handleLoadMore}>load more</button>
-                </div>
-            </div>
         );
     }
 }
