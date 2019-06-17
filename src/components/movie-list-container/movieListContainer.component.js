@@ -11,7 +11,8 @@ import { getNowPlayingMoviesPaged, getGenreList, searchMovie } from '../../servi
 const VIEW_STATES = {
     SEARCH_VIEW: 0,
     NOW_PLAYING_VIEW: 1,
-    SERVER_ERROR: 2
+    SERVER_ERROR: 2,
+    NO_RESULTS: 3
 }
 
 const INITIAL_STATE = {
@@ -60,7 +61,7 @@ class MovieListContainer extends Component {
     componentWillReceiveProps(nextProps) {
 
 
-        if (nextProps.query != null) {
+        if (nextProps.query !== null && nextProps.query !== '') {
 
             let newState = {
 
@@ -101,12 +102,19 @@ class MovieListContainer extends Component {
 
     handleGetMoviesSuccess = response => {
         const movies = [...this.state.movies, ...response.results];
-        this.setState({
+
+        let newState = {
             movies,
             loading: false,
             totalResults: response.total_results,
             totalPages: response.total_pages
-        })
+        };
+
+        if (response.total_results === 0) {
+            newState['viewState'] = VIEW_STATES.NO_RESULTS
+        }
+
+        this.setState(newState)
     }
 
     handleGetMoviesError = error => {
@@ -146,21 +154,48 @@ class MovieListContainer extends Component {
     }
     render() {
 
-        const { loading, movies, viewState, genreList, totalResults, query } = this.state;
+        const { loading, movies, viewState, genreList, totalResults, query, error } = this.state;
+
+        if (viewState === VIEW_STATES.SERVER_ERROR) {
+            return (
+                <div className="md-container">
+
+                    <div className="md-sub-title">
+                        Server Error
+                    </div>
+                    <p>
+                        Message: {error}
+                    </p>
+                </div>
+            )
+        }
+
+        if (viewState === VIEW_STATES.NO_RESULTS) {
+            return (
+                <div className="md-container">
+
+                    <div className="md-sub-title">
+                        No results Found...
+                    </div>
+                    <p>
+                        There are no movies that matched your query.
+                    </p>
+                </div>
+            )
+        }
 
         return (
             <div className="md-container">
 
-                <div className="movie-list-title">
-                    <h4>
-                        {viewState === VIEW_STATES.NOW_PLAYING_VIEW ? 'Now In Theaters' : 'Search results'}
+                <div className="md-sub-title">
 
-                    </h4>
-                    <h5>
-                        Query: {query}
-                        <br />
-                        Total results: {totalResults}
-                    </h5>
+                    {viewState === VIEW_STATES.NOW_PLAYING_VIEW ? 'Now In Theaters' : null}
+                    {viewState === VIEW_STATES.SEARCH_VIEW ? (
+                        <React.Fragment>
+
+                            Search for '{query}' <i><small>total results: {totalResults}</small></i>
+                        </React.Fragment>
+                    ) : null}
                 </div>
                 <div className="movie-list-container">
                     {movies.map(
@@ -174,9 +209,14 @@ class MovieListContainer extends Component {
                             )
                         }
                     )}
+
+                    {loading ?
+                        GRID_LAYOUT_PATTERN.map((size, key) => (
+                            <MovieListItem ghostMovie={true} size={size} key={key}></MovieListItem>))
+                        : null}
+
                 </div>
 
-                {loading ? "loading.." : null}
 
                 <div className="">
                     <button onClick={this.handleLoadMore}>load more</button>

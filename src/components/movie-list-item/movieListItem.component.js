@@ -12,6 +12,7 @@ class MovieListItem extends Component {
 
     state = {
         genreNames: [],
+        isGhostMovie: false,
         isMoreInfoExpanded: false
     }
 
@@ -19,6 +20,10 @@ class MovieListItem extends Component {
         if (nextProps.genreList) {
             // console.log(nextProps.genreList)
             this.setGenreNames(nextProps.genreList);
+        }
+
+        if (nextProps.ghostMovie) {
+            this.setState({ isGhostMovie: true });
         }
     }
 
@@ -69,33 +74,66 @@ class MovieListItem extends Component {
         return genreNames;
     }
 
+    getProps = () => {
+        if (this.props.ghostMovie) {
+            return this.getGhostProperties();
+        }
+        return this.getMovieProps(this.props);
+    }
+    getMovieProps = () => {
+        return {
+            ghostClass: '',
+            size: this.props.size,
+            overview: this.props.movie.overview,
+            imgSrc: `https://image.tmdb.org/t/p/w500/${this.props.movie.poster_path}`,
+            title: this.props.movie.title,
+            genre: 'Animation',
+            releaseDate: this.props.movie.release_date,
+            voteAverage: this.props.movie.vote_average
+        }
+    }
+
+    getGhostProperties = () => {
+        const size = this.props.size ? this.props.size: 'md'; 
+        return {
+            ghostClass: 'mv-card-ghost',
+            size: size,
+            overview: '',
+            imgSrc: '',
+            title: '',
+            genre: '',
+            releaseDate: '',
+            voteAverage: ''
+        }
+    }
+
     render() {
 
         const {
-            poster_path,
+            ghostClass,
+            size,
+            overview,
+            imgSrc,
             title,
-            release_date,
-            vote_average,
-            overview } = this.props.movie;
-        const { size } = this.props;
-        const img_src = `https://image.tmdb.org/t/p/w500/${poster_path}`;
+            genre,
+            releaseDate,
+            voteAverage } = this.getProps();
 
-        const { isMoreInfoExpanded } = this.state;
 
         return (
             <div className={`mv-masonry-grid mv-masonry-${size}`} title={overview}>
                 <div
-                    className={`mv-card  mv-card-${size}`}>
+                    className={`mv-card  mv-card-${size} ${ghostClass}`}>
 
                     <div className="mv-card-poster"
-                        style={{ backgroundImage: `url(${img_src})` }}>
-                        </div>
+                        style={{ backgroundImage: `url(${imgSrc})` }}>
+                    </div>
                     <div className="mv-card-content">
                         <div className="title">
                             {title}
                         </div>
                         <div className="genre">
-                            Animation{/* {genre} */}
+                            {genre}
                         </div>
                         <div className="overview">
                             {overview}
@@ -103,17 +141,17 @@ class MovieListItem extends Component {
                     </div>
                     <div className="mv-card-footer">
                         <div className="md-block-left">
-                            {release_date}
+                            {releaseDate}
                         </div>
                         <div className="md-block-right text-right">
-                            Rate: {vote_average}
+                            Rate: {voteAverage}
                         </div>
                     </div>
                 </div>
 
             </div>
         )
-       
+
 
 
     }
