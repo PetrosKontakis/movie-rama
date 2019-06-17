@@ -1,0 +1,12 @@
+@import '../../styles/variables';
+
+.search-box-form{
+    display: inline-block;
+}
+.search-box{
+    background: $background-color;
+    width: 100%;
+    max-width: 240px;
+    margin: auto;
+    margin-bottom: 16px;
+}

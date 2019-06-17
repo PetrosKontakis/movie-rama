@@ -1,5 +1,6 @@
 import React from 'react';
-
+import './header.component.style.scss';
+import SearchBox from '../search-box/searchBox.component';
 
 /**
  * Name: Header
@@ -8,12 +9,23 @@ import React from 'react';
  * @param {*} props 
  */
 const Header = (props) => {
-    return (
-        <div className="header">
-            <h1 className="brand-name">
+
+    const headerContentTemplate = (
+        <div className="md-container">
+            <div className="brand-name">
                 MovieRama
-            </h1>
+            </div>
+            <SearchBox onQueryChange={props.onSearchQueryChange}></SearchBox>
         </div>
+    )
+    return (
+        <div className="md-header header-component-container">
+            {headerContentTemplate}
+            <div className="md-header-content-fixed header-component-container-fixed">
+                {headerContentTemplate}
+            </div>
+        </div>
+
     )
 }
 

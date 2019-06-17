@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 
+import './searchBox.component.style.scss';
+
 const DELAY = 600;
 
 /**
@@ -35,10 +37,12 @@ class SearchBox extends Component {
     render() {
         const { searchQuery } = this.state;
         return (
-            <form onSubmit={this.handleSubmit}>
-                <label htmlFor="search">Search</label>
+            <form className="search-box-form" onSubmit={this.handleSubmit}>
+
                 <input
+                    className="md-input search-box"
                     autoComplete="off"
+                    placeholder="Search for a movie, tv show, person..."
                     onChange={this.handleOnChange}
                     type="text"
                     id="searchQuery"

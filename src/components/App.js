@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 
 import Header from './header/header.component';
 import MovieListContainer from './movie-list-container/movieListContainer.component';
-import SearchBox from './search-box/searchBox.component';
 
 /**
  * Name: App
@@ -23,8 +22,7 @@ class App extends Component {
     const { movieQuery } = this.state;
     return (
       <React.Fragment>
-        <Header></Header>
-        <SearchBox onQueryChange={this.handleOnQueryChange}></SearchBox>
+        <Header onSearchQueryChange={this.handleOnQueryChange}></Header>
         <MovieListContainer query={movieQuery}></MovieListContainer>
       </React.Fragment>
     );

@@ -1,10 +1,24 @@
+@import './variables';
+@import './mixins';
+
 .md-container {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1050px;
   position: relative;
-  float: left;
   margin: auto;
   padding: 0 16px;
+}
+
+.md-header {
+  width: 100%;
+  z-index: 100;
+  .md-header-content-fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+  }
 }
 
 .md-block-right {
@@ -20,4 +34,17 @@
 
 .text-center {
   text-align: center;
+}
+
+.md-input {
+  border: 0;
+  background: white;
+  padding: 8px 16px;
+  border-radius: 15px;
+  outline: 0;
+  @include transition();
+  &:focus {
+    background: $background-color-secondary;
+    @include shadow(0px 0px 4px 0px rgba(0,0,0,0.3))
+  }
 }
