@@ -3,6 +3,8 @@ import React, { Component } from 'react';
 import MovieListItem from '../movie-list-item/movieListItem.component';
 import { getNowPlayingMoviesPaged, getGenreList, searchMovie } from '../../services/httpActions.service';
 
+
+
 /**
  * Available view states
  */
@@ -24,6 +26,16 @@ const INITIAL_STATE = {
     movies: []
 }
 
+const GRID_LAYOUT_PATTERN = [
+    'lg',
+    'sm',
+    'sm',
+    'sm',
+    'sm',
+    'sm',
+    'md'
+];
+
 /**
  * 
  * Name: MovieListContainer
@@ -35,6 +47,8 @@ class MovieListContainer extends Component {
 
     //  Set up initial state
     state = INITIAL_STATE;
+
+
 
 
     // On component mount execute http request
@@ -84,7 +98,7 @@ class MovieListContainer extends Component {
         }
 
     }
-    
+
     handleGetMoviesSuccess = response => {
         const movies = [...this.state.movies, ...response.results];
         this.setState({
@@ -125,11 +139,17 @@ class MovieListContainer extends Component {
         this.getNextPage();
     }
 
+    getMovieSizeFromPattern = (index) => {
+
+        const quotient = (index % GRID_LAYOUT_PATTERN.length);
+        return GRID_LAYOUT_PATTERN[quotient];
+    }
     render() {
 
         const { loading, movies, viewState, genreList, totalResults, query } = this.state;
+
         return (
-            <div>
+            <div className="md-container">
 
                 <div className="movie-list-title">
                     <h4>
@@ -144,9 +164,15 @@ class MovieListContainer extends Component {
                 </div>
                 <div className="movie-list-container">
                     {movies.map(
-                        (movie) => (
-                            <MovieListItem movie={movie} genreList={genreList} key={movie.id}></MovieListItem>
-                        )
+                        (movie, key) => {
+                            return (
+                                <MovieListItem
+                                    size={this.getMovieSizeFromPattern(key)}
+                                    movie={movie}
+                                    genreList={genreList}
+                                    key={movie.id}></MovieListItem>
+                            )
+                        }
                     )}
                 </div>
 

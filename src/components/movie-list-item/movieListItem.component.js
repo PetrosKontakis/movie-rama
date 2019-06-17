@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
+import './movieListItem.component.style.scss';
+import { getMovieDetails, getMovieVideos, getMovieReviews, getMovieSimilar } from '../../services/httpActions.service';
 
-import {getMovieDetails, getMovieVideos, getMovieReviews, getMovieSimilar} from '../../services/httpActions.service'; 
 
 /**
  * Name: MovieListItem
@@ -22,8 +23,8 @@ class MovieListItem extends Component {
     }
 
     expandMoreInfo = (e) => {
-        this.setState({ isMoreInfoExpanded: !this.state.isMoreInfoExpanded }, ()=> {
-            if(this.state.isMoreInfoExpanded){
+        this.setState({ isMoreInfoExpanded: !this.state.isMoreInfoExpanded }, () => {
+            if (this.state.isMoreInfoExpanded) {
                 getMovieDetails(this.props.movie.id).then(
                     response => console.log(response)
                 ).catch(
@@ -76,27 +77,45 @@ class MovieListItem extends Component {
             release_date,
             vote_average,
             overview } = this.props.movie;
+        const { size } = this.props;
         const img_src = `https://image.tmdb.org/t/p/w500/${poster_path}`;
 
         const { isMoreInfoExpanded } = this.state;
 
         return (
-            <div className="" onClick={this.expandMoreInfo}>
-                <img src={img_src} alt={title} />
-                <ul>
-                    <li>Poster: {poster_path}</li>
-                    <li>Title: {title}</li>
-                    <li>Year of release: {release_date}</li>
-                    <li>Genre(s): </li>
-                    <li>Vote average: {vote_average}</li>
-                    <li>Overview: {overview}</li>
-                </ul>
+            <div className={`mv-masonry-grid mv-masonry-${size}`} title={overview}>
+                <div
+                    className={`mv-card  mv-card-${size}`}>
 
-                {isMoreInfoExpanded ? (<div>More info</div>) : null}
-
+                    <div className="mv-card-poster"
+                        style={{ backgroundImage: `url(${img_src})` }}>
+                        </div>
+                    <div className="mv-card-content">
+                        <div className="title">
+                            {title}
+                        </div>
+                        <div className="genre">
+                            Animation{/* {genre} */}
+                        </div>
+                        <div className="overview">
+                            {overview}
+                        </div>
+                    </div>
+                    <div className="mv-card-footer">
+                        <div className="md-block-left">
+                            {release_date}
+                        </div>
+                        <div className="md-block-right text-right">
+                            Rate: {vote_average}
+                        </div>
+                    </div>
+                </div>
 
             </div>
         )
+       
+
+
     }
 }
 
