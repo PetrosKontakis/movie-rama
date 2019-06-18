@@ -23,7 +23,7 @@ class DashBoardPage extends Component {
 
     render() {
 
-        const { movieQuery, pageScrolledToBottom } = this.state;
+        const { movieQuery} = this.state;
         return (
             <div className="md-page-container" onScroll={this.handleOnScroll}>
                 <Header onSearchQueryChange={this.handleOnQueryChange}></Header>

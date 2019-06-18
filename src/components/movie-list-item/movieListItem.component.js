@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './movieListItem.component.style.scss';
+import store, { EVENTS } from '../../services/store.service';
 
 
 /**
@@ -16,45 +17,33 @@ class MovieListItem extends Component {
         expandStyle: null
     }
 
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.genreList) {
-            // console.log(nextProps.genreList)
-            this.setGenreNames(nextProps.genreList);
+    componentDidMount() {
+        if (this.props.ghostMovie) {
+            return this.setState({ isGhostMovie: true });
         }
 
-        if (nextProps.ghostMovie) {
-            this.setState({ isGhostMovie: true });
-        }
+        store.onStoreChange(EVENTS.GENRE_LIST_RECEIVED,
+            (data) => {
+                this.setGenreNames(data)
+            })
     }
 
-    handleCardClick = (e) => {
 
+    handleCardClick = (e) => {
 
         if (this.state.isGhostMovie) {
             return;
         }
-
         this.props.onMovieSelect(this.props.movie, this.getOffset(e.currentTarget));
 
     }
 
     setGenreNames(genreList) {
-        const genreNames = genreList.reduce((genreObj, genre) => {
-            genreObj[genre.id] = genre.name;
-            return genreObj
-        }, {})
-        // console.log(genreNames);
+        const { genre_ids } = this.props.movie;
+        const genreNames = genreList.filter((genre) => {
+            return genre_ids.includes(genre.id);
+        }).map(genre => genre.name);
         this.setState({ genreNames });
-    }
-
-
-    getGenres(genre_ids) {
-        const genreNames = genre_ids.map((id) => {
-            // console.log(GENRES[id]);
-            return (<span key={id}>{this.genreNames[id]}, </span>)
-        })
-
-        return genreNames;
     }
 
     getProps = () => {
@@ -70,7 +59,7 @@ class MovieListItem extends Component {
             overview: this.props.movie.overview,
             imgSrc: `https://image.tmdb.org/t/p/w500/${this.props.movie.poster_path}`,
             title: this.props.movie.title,
-            genre: 'Animation',
+            genre: this.state.genreNames.join(', '),
             releaseDate: this.props.movie.release_date,
             voteAverage: this.props.movie.vote_average
         }
@@ -92,11 +81,9 @@ class MovieListItem extends Component {
 
     getOffset = (el) => {
         const rect = el.getBoundingClientRect();
-        // const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-        // const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         const scrollLeft = 0;
         const scrollTop = 0;
-        
+
         return {
             top: rect.top + scrollTop,
             left: rect.left + scrollLeft,

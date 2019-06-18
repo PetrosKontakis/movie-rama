@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import MovieListItem from '../movie-list-item/movieListItem.component';
 import MovieDetails from '../movie-details/movieDetails.component';
-import { getNowPlayingMoviesPaged, getGenreList, searchMovie, getMovieSimilar } from '../../services/httpActions.service';
+import { getNowPlayingMoviesPaged,  searchMovie, getMovieSimilar } from '../../services/httpActions.service';
 
 
 /**
@@ -25,7 +25,6 @@ const INITIAL_STATE = {
     totalResults: null,
     query: '',
     similarMovieId: null,
-    genreList: [],
     movies: [],
     selectedMovieIndex: 0,
     selectedMovie: null,
@@ -71,7 +70,6 @@ class MovieListContainer extends Component {
         }
         this.setState(newState, () => {
             this.getMovies();
-            this.getGenreList();
         })
     }
 
@@ -103,11 +101,6 @@ class MovieListContainer extends Component {
 
     }
 
-    getGenreList = () => {
-        getGenreList().then((response) => {
-            this.setState({ genresList: response.genres })
-        })
-    }
     // This function execute http request
     getMovies = () => {
 
@@ -219,7 +212,6 @@ class MovieListContainer extends Component {
             loading,
             movies,
             viewState,
-            genreList,
             totalResults,
             query,
             error
@@ -277,7 +269,6 @@ class MovieListContainer extends Component {
                                     onMovieSelect={this.onMovieSelect}
                                     size={this.getMovieSizeFromPattern(key)}
                                     movie={movie}
-                                    genreList={genreList}
                                     key={key}></MovieListItem>
                             )
                         }

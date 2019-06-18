@@ -1,30 +1,44 @@
 
-export const STORE_EVENTS = {
-    DASHBOARD_PAGE_BOTTOM_SCROLL: 'DASHBOARD_PAGE_BOTTOM_SCROLL'
+export const EVENTS = {
+    GENRE_LIST_RECEIVED: 'GENRE_LIST_RECEIVED'
 }
 
 class StoreManager {
 
     constructor() {
-        this.store = {};
+        this.emitters = {};
+        this.data = {};
     }
 
     emit = (event, data, log) => {
-        if(log){
-            console.log(event)
+        if (log) {
+            console.log(event, data)
         }
-        this.store[event].map(callback => callback(data));
+
+        // Store event data 
+        this.data[event] = data;
+        if (this.emitters[event] == null) {
+            return;
+        }
+        this.emitters[event].map(callback => callback(data));
     }
 
     onStoreChange = (event, callback) => {
-        if(!this.store[event]){
-            this.store[event] = [];
+        if (!this.emitters[event]) {
+            this.emitters[event] = [];
         }
-        this.store[event].push(callback);
+        // Store emitter callback
+        this.emitters[event].push(callback);
+        // Execute callback  if exist data
+        if(this.data[event]){
+            callback(this.data[event]);
+        }
+        //  Return data anyway
+        return this.data[event];
     }
 
     destroyStore = (event) => {
-        delete this.store[event];
+        delete this.emitters[event];
     }
 }
 
