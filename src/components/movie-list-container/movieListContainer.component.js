@@ -62,7 +62,6 @@ class MovieListContainer extends Component {
     // On component mount execute http request
     componentDidMount() {
         var newState = this.state;
-        console.log(this.props.similarMovieId)
         if (this.props.similarMovieId) {
             newState['similarMovieId'] = this.props.similarMovieId; 
             newState['viewState'] = VIEW_STATES.SIMILAR_MOVIES_VIEW
@@ -75,7 +74,6 @@ class MovieListContainer extends Component {
 
     componentWillReceiveProps(nextProps) {
 
-        console.log("componentWillReceiveProps", nextProps, this.state.viewState)
         if(this.state.viewState === VIEW_STATES.SIMILAR_MOVIES_VIEW) {
             return;
         }
@@ -106,7 +104,6 @@ class MovieListContainer extends Component {
     getMovies = () => {
 
         this.setState({ loading: true });
-        console.log(this.state.viewState, VIEW_STATES)
 
         if (this.state.viewState === VIEW_STATES.SEARCH_VIEW) {
             searchMovie(this.state.query, this.state.currentPage)

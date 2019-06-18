@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import MovieReview from '../movie-review/movieReview.component';
+import MovieReviewContainer from '../movie-review-container/movieReviewContainer.component';
 import MovieListContainer from '../movie-list-container/movieListContainer.component';
-import { getMovieReviews, getMovieVideos, getMovieSimilar } from '../../services/httpActions.service';
+import MovieTrailerContainer from '../movie-trailer-container/movieTrailerContainer.component';
 import backIcon from '../../images/baseline-keyboard_arrow_left-24px.svg'
 import './movieDetails.component.style.scss';
 
@@ -29,8 +29,7 @@ class MovieDetails extends Component {
         this.setState({
             starterPosition: this.props.starterPosition,
             position: this.props.starterPosition,
-            movie: this.props.movie,
-            reviews: null
+            movie: this.props.movie
 
         })
 
@@ -39,19 +38,7 @@ class MovieDetails extends Component {
             isFullScreen: true
         }))
 
-        getMovieReviews(this.props.movie.id).then(
-            response => {
-                this.setState({ reviews: response.results })
-            }
-        ).catch(
-            error => console.log(error)
-        )
-        getMovieVideos(this.props.movie.id).then(
-            response => console.log(response)
-        ).catch(
-            error => console.log(error)
-        )
-       
+
     }
 
 
@@ -65,7 +52,7 @@ class MovieDetails extends Component {
     }
 
     render() {
-        const { position, movie, isFullScreen, reviews } = this.state;
+        const { position, movie, isFullScreen } = this.state;
         const posterCoverSrc = `https://image.tmdb.org/t/p/w1400_and_h450_face/${movie.poster_path}`
         const posterPreviewSrc = `https://image.tmdb.org/t/p/w116_and_h174_face/${movie.poster_path}`
         return (
@@ -76,8 +63,8 @@ class MovieDetails extends Component {
                 <div className="mv-details-header">
                     <div className="md-container">
                         <button className="md-button" onClick={this.handleClose}>
-                            <img src={backIcon} alt="back" /> 
-                           
+                            <img src={backIcon} alt="back" />
+
                         </button>
                         <div className="mv-details-header-title">
                             {movie.title}
@@ -116,17 +103,13 @@ class MovieDetails extends Component {
                             Trailers
                         </div>
                         <div className="horizontal-container">
-
-
+                            <MovieTrailerContainer movieId={movie.id}></MovieTrailerContainer>
                         </div>
                         <div className="md-sub-title">
                             Reviews
                         </div>
                         <div>
-                            {reviews ? reviews.map(review => (
-                                <MovieReview key={review.id} review={review}></MovieReview>
-                                )
-                            ): null}
+                            <MovieReviewContainer movieId={movie.id}></MovieReviewContainer>
                         </div>
                         <div className="md-sub-title">
                             Similar movies
@@ -135,7 +118,7 @@ class MovieDetails extends Component {
 
                     </div>
                 </div>
-        
+
             </div>
         )
     }
