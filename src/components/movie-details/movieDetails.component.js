@@ -24,6 +24,8 @@ class MovieDetails extends Component {
         isFullScreen: false
     }
 
+    timerAnimationIn = null;
+
     componentWillMount() {
 
         this.setState({
@@ -33,11 +35,17 @@ class MovieDetails extends Component {
 
         })
 
-        setTimeout(() => this.setState({
+        this.timerAnimationIn = setTimeout(() => this.setState({
             position: FULL_WIDTH_POSITION,
             isFullScreen: true
         }))
 
+
+    }
+
+    componentWillUnmount() {
+        clearTimeout(this.timerAnimationIn);
+        clearTimeout(this.timerAnimationOut);
 
     }
 
@@ -47,9 +55,19 @@ class MovieDetails extends Component {
             position: this.state.starterPosition,
             isFullScreen: false
         })
-        setTimeout(() => this.props.onMovieDetailsClose(), 200);
+        this.timerAnimationOut = setTimeout(() => this.props.onMovieDetailsClose(), 200);
 
     }
+
+    handleOnScroll = (e) => {
+        const { scrollHeight, scrollTop, clientHeight } = e.currentTarget;
+        if (scrollHeight - scrollTop === clientHeight) {
+            if (this.movieList) {
+                this.movieList.getNextPage();
+            }
+        }
+    }
+
 
     render() {
         const { position, movie, isFullScreen } = this.state;
@@ -60,62 +78,67 @@ class MovieDetails extends Component {
                 style={position}
                 className="mv-details-container">
 
-                <div className="mv-details-header">
-                    <div className="md-container">
-                        <button className="md-button" onClick={this.handleClose}>
-                            <img src={backIcon} alt="back" />
+                <div className="md-page-container" onScroll={this.handleOnScroll}>
 
-                        </button>
-                        <div className="mv-details-header-title">
-                            {movie.title}
+                    <div className="mv-details-header">
+                        <div className="md-container">
+                            <button className="md-button" onClick={this.handleClose}>
+                                <img src={backIcon} alt="back" />
+
+                            </button>
+                            <div className="mv-details-header-title">
+                                {movie.title}
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div
-                    className="mv-details-poster"
-                    style={{ backgroundImage: `url(${posterCoverSrc})` }}>
-                </div>
-                <div className="md-container mv-details-content-card">
+                    <div
+                        className="mv-details-poster"
+                        style={{ backgroundImage: `url(${posterCoverSrc})` }}>
+                    </div>
+                    <div className="md-container mv-details-content-card">
 
 
-                    <div className={`mv-details-movie-content ${isFullScreen ? 'show' : 'hide'}`}>
+                        <div className={`mv-details-movie-content ${isFullScreen ? 'show' : 'hide'}`}>
 
-                        <div className="poster-preview-container">
-                            <img src={posterPreviewSrc} alt={movie.title} />
-                        </div>
+                            <div className="poster-preview-container">
+                                <img src={posterPreviewSrc} alt={movie.title} />
+                            </div>
 
-                        <div className="md-title">
-                            {movie.title}
+                            <div className="md-title">
+                                {movie.title}
+                            </div>
+                            <div className="md-sub-title">
+                                Overview
                         </div>
-                        <div className="md-sub-title">
-                            Overview
-                        </div>
-                        <div className="md-paragraph">
-                            {movie.overview}
-                        </div>
+                            <div className="md-paragraph">
+                                {movie.overview}
+                            </div>
 
-                        <div className="md-paragraph sub-info">
-                            {movie.release_date}, Rating {movie.vote_average}
-                        </div>
+                            <div className="md-paragraph sub-info">
+                                {movie.release_date}, Rating {movie.vote_average}
+                            </div>
 
 
-                        <div className="md-sub-title">
-                            Trailers
+                            <div className="md-sub-title">
+                                Trailers
                         </div>
-                        <div className="horizontal-container">
-                            <MovieTrailerContainer movieId={movie.id}></MovieTrailerContainer>
+                            <div className="horizontal-container">
+                                <MovieTrailerContainer movieId={movie.id}></MovieTrailerContainer>
+                            </div>
+                            <div className="md-sub-title">
+                                Reviews
                         </div>
-                        <div className="md-sub-title">
-                            Reviews
+                            <div>
+                                <MovieReviewContainer movieId={movie.id}></MovieReviewContainer>
+                            </div>
+                            <div className="md-sub-title">
+                                Similar movies
                         </div>
-                        <div>
-                            <MovieReviewContainer movieId={movie.id}></MovieReviewContainer>
-                        </div>
-                        <div className="md-sub-title">
-                            Similar movies
-                        </div>
-                        <MovieListContainer similarMovieId={movie.id}></MovieListContainer>
+                            <MovieListContainer 
+                                onRef={ref => (this.movieList = ref)}
+                                similarMovieId={movie.id}></MovieListContainer>
 
+                        </div>
                     </div>
                 </div>
 

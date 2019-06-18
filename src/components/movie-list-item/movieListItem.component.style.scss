@@ -20,6 +20,21 @@ $poster_width: 89px;
   &.mv-masonry-sm {
     width: 25%;
   }
+  @media (max-width: $sm-screen) {
+    &.mv-masonry-lg {
+      width: 100%;
+    }
+    &.mv-masonry-md,
+    &.mv-masonry-sm {
+      width: 50%;
+    }
+  }
+  @media (max-width: $xs-screen) {
+    &.mv-masonry-md,
+    &.mv-masonry-sm {
+      width: 100%;
+    }
+  }
 }
 
 .mv-card {
@@ -111,7 +126,7 @@ $poster_width: 89px;
     opacity: 0;
     @include transition();
   }
-  &:hover{
+  &:hover {
     .mv-card-content,
     .mv-card-footer {
       opacity: 1;

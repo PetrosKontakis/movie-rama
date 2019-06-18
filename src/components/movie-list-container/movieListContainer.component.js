@@ -5,7 +5,6 @@ import MovieDetails from '../movie-details/movieDetails.component';
 import { getNowPlayingMoviesPaged, getGenreList, searchMovie, getMovieSimilar } from '../../services/httpActions.service';
 
 
-
 /**
  * Available view states
  */
@@ -59,22 +58,32 @@ class MovieListContainer extends Component {
 
 
 
+
     // On component mount execute http request
     componentDidMount() {
+
+        this.props.onRef(this)
+
         var newState = this.state;
         if (this.props.similarMovieId) {
-            newState['similarMovieId'] = this.props.similarMovieId; 
+            newState['similarMovieId'] = this.props.similarMovieId;
             newState['viewState'] = VIEW_STATES.SIMILAR_MOVIES_VIEW
         }
-        this.setState(newState, ()=>{
+        this.setState(newState, () => {
             this.getMovies();
             this.getGenreList();
         })
     }
 
+    componentWillUnmount() {
+        this.props.onRef(null)
+    }
+
     componentWillReceiveProps(nextProps) {
 
-        if(this.state.viewState === VIEW_STATES.SIMILAR_MOVIES_VIEW) {
+
+
+        if (this.state.viewState === VIEW_STATES.SIMILAR_MOVIES_VIEW) {
             return;
         }
         if (nextProps.query != null && nextProps.query !== '') {
@@ -88,7 +97,6 @@ class MovieListContainer extends Component {
 
             this.setState(newState, () => this.getMovies());
         } else {
-            console.log('componentWillReceiveProps')
             this.setState(INITIAL_STATE, () => this.getMovies());
         }
 
@@ -109,11 +117,11 @@ class MovieListContainer extends Component {
             searchMovie(this.state.query, this.state.currentPage)
                 .then(this.handleGetMoviesSuccess)
                 .catch(this.handleGetMoviesError)
-        } else if(this.state.viewState === VIEW_STATES.SIMILAR_MOVIES_VIEW) {
+        } else if (this.state.viewState === VIEW_STATES.SIMILAR_MOVIES_VIEW) {
             getMovieSimilar(this.state.similarMovieId, this.state.currentPage)
                 .then(this.handleGetMoviesSuccess)
                 .catch(this.handleGetMoviesError)
-        }else{
+        } else {
             getNowPlayingMoviesPaged(this.state.currentPage)
                 .then(this.handleGetMoviesSuccess)
                 .catch(this.handleGetMoviesError)
@@ -149,7 +157,7 @@ class MovieListContainer extends Component {
 
     //  Increase currentPage and execute http getMovies
     getNextPage = () => {
-
+        console.log("getNextPage executed")
         //  Check if exist next page first
         const { totalPages, currentPage } = this.state;
         if (totalPages && currentPage >= totalPages) {
@@ -252,39 +260,37 @@ class MovieListContainer extends Component {
                 {/* Render selected movie */}
                 {this.renderSelectedMovie()}
 
-                <div className="md-container">
 
-                    <div className="md-sub-title">
-                        {viewState === VIEW_STATES.NOW_PLAYING_VIEW ? 'Now In Theaters' : null}
-                        {viewState === VIEW_STATES.SEARCH_VIEW ? (
-                            <React.Fragment>
-                                Search for '{query}' <i><small>total results: {totalResults}</small></i>
-                            </React.Fragment>
-                        ) : null}
-                    </div>
-                    <div className="movie-list-container">
-                        {movies.map(
-                            (movie, key) => {
-                                return (
-                                    <MovieListItem
-                                        onMovieSelect={this.onMovieSelect}
-                                        size={this.getMovieSizeFromPattern(key)}
-                                        movie={movie}
-                                        genreList={genreList}
-                                        key={movie.id}></MovieListItem>
-                                )
-                            }
-                        )}
+                <div className="md-sub-title">
+                    {viewState === VIEW_STATES.NOW_PLAYING_VIEW ? 'Now In Theaters' : null}
+                    {viewState === VIEW_STATES.SEARCH_VIEW ? (
+                        <React.Fragment>
+                            Search for '{query}' <i><small>total results: {totalResults}</small></i>
+                        </React.Fragment>
+                    ) : null}
+                </div>
+                <div className="md-list">
+                    {movies.map(
+                        (movie, key) => {
+                            return (
+                                <MovieListItem
+                                    onMovieSelect={this.onMovieSelect}
+                                    size={this.getMovieSizeFromPattern(key)}
+                                    movie={movie}
+                                    genreList={genreList}
+                                    key={key}></MovieListItem>
+                            )
+                        }
+                    )}
 
-                        {loading ?
-                            GRID_LAYOUT_PATTERN.map((size, key) => (
-                                <MovieListItem ghostMovie={true} size={size} key={key}></MovieListItem>))
-                            : null}
-                    </div>
+                    {loading ?
+                        GRID_LAYOUT_PATTERN.map((size, key) => (
+                            <MovieListItem ghostMovie={true} size={size} key={key}></MovieListItem>))
+                        : null}
+                </div>
 
-                    <div className="">
-                        <button onClick={this.handleLoadMore}>load more</button>
-                    </div>
+                <div className="text-center">
+                    <button className="md-button" onClick={this.handleLoadMore}>Loading...</button>
                 </div>
             </React.Fragment>
 
