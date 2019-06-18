@@ -7,6 +7,12 @@
   position: relative;
   margin: auto;
   padding: 0 16px;
+  &:after{
+    // clear fix
+    content: "";
+    clear: both;
+    display: table;
+  }
 }
 
 .md-header {
