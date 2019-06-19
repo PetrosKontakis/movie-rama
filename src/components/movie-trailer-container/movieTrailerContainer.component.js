@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { getMovieVideos } from '../../services/httpActions.service';
-import MovieTrailer from '../movie-trailer/movieTrailer.component';
+import MovieTrailer, {MovieTrailerGhost} from '../movie-trailer/movieTrailer.component';
 import "./movieTrailerContainer.component.style.scss"
 
 const VIEW_STATES = {
@@ -57,7 +57,7 @@ class MovieTrailerContainer extends Component {
     renderLoading = () => {
         //  Preview on ghost movie trailer
         return (
-            <MovieTrailer trailer={{}} isGhost={true}></MovieTrailer>
+            <MovieTrailerGhost></MovieTrailerGhost>
         );
     }
 

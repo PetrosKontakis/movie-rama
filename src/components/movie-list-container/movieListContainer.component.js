@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import MovieListItem from '../movie-list-item/movieListItem.component';
+import MovieListItem, { MovieListItemGhost } from '../movie-list-item/movieListItem.component';
 import MovieDetails from '../movie-details/movieDetails.component';
 import { getNowPlayingMoviesPaged, searchMovie, getMovieSimilar } from '../../services/httpActions.service';
 
@@ -277,11 +277,13 @@ class MovieListContainer extends Component {
                                 )
                             }
                         )}
-                        <div className="clear-fix"></div>
+
                         {loading ?
                             GRID_LAYOUT_PATTERN.map((size, key) => (
-                                <MovieListItem ghostMovie={true} size={size} key={key}></MovieListItem>))
+                                <MovieListItemGhost key={key}></MovieListItemGhost>))
                             : null}
+
+                        <div className="clear-fix"></div>
                     </div>
                 </div>
 

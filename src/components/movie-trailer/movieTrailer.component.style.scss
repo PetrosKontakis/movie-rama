@@ -31,8 +31,5 @@
 
     &.ghost{
         @include gradientAnimation($background-color-secondary, white);
-        .overlay, .content{
-            display: none;
-        }
     }
 }

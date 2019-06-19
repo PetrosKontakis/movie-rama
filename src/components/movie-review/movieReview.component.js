@@ -1,22 +1,28 @@
 import React from 'react';
 import './movieReview.component.style.scss'
 
-const MAX_REVIEW_CONTENT = 250;
+export const MovieRevieGhost = () => {
+    return (
+        <div className="md-paragraph movie-review ghost">
+            <div className="movie-review-author">
+            </div>
+            <div className="movie-review-content">
+            </div>
+        </div>
+    )
+}
+
 const MovieReview = (props) => {
 
+    const MAX_REVIEW_CONTENT = 250;
     const { author, content, url } = props.review
-    const { isGhost } = props;
 
-    
     const showMore = content && content.length > MAX_REVIEW_CONTENT;
     const shortContent = content && content.substring(0, MAX_REVIEW_CONTENT);
-    const ghostClass = isGhost ? 'ghost' : '';
 
     return (
-        <div className={`md-paragraph movie-review ${ghostClass}`}>
-
+        <div className="md-paragraph movie-review">
             <div className="movie-review-author">
-
                 <i> {author}</i>
             </div>
             <div className="movie-review-content">

@@ -144,19 +144,14 @@ $poster_width: 89px;
 
 .mv-card.mv-card-ghost {
   .mv-card-poster {
-    background: $background-color-secondary;
+    @include gradientAnimation($background-color-secondary, white);
   }
 
   .mv-card-content {
     opacity: 1;
-  }
-  .mv-card-footer {
-    opacity: 0;
-  }
-
-  .mv-card-content .title {
     margin-top: 16px;
   }
+
   .mv-card-content .title,
   .mv-card-content .genre {
     height: 0;

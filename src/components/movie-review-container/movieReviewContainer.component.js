@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import MovieReview from '../movie-review/movieReview.component';
+import MovieReview, {MovieRevieGhost} from '../movie-review/movieReview.component';
 import { getMovieReviews } from '../../services/httpActions.service';
 
 const VIEW_STATES = {
@@ -40,7 +40,7 @@ class MovieReviewContainer extends Component {
     renderLoading = () => {
         return (
             <div className="md-paragraph">
-                <MovieReview isGhost="true" review={{}}></MovieReview>
+                <MovieRevieGhost></MovieRevieGhost>
             </div>
         )
     }
