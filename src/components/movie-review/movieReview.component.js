@@ -1,7 +1,9 @@
 import React from 'react';
-import './movieReview.component.style.scss'
+import PropTypes from 'prop-types';
+import Review from '../../services/models/review.model';
+import './movieReview.component.style.scss';
 
-export const MovieRevieGhost = () => {
+export const MovieReviewGhost = () => {
     return (
         <div className="md-paragraph movie-review ghost">
             <div className="movie-review-author">
@@ -14,23 +16,24 @@ export const MovieRevieGhost = () => {
 
 const MovieReview = (props) => {
 
-    const MAX_REVIEW_CONTENT = 250;
-    const { author, content, url } = props.review
-
-    const showMore = content && content.length > MAX_REVIEW_CONTENT;
-    const shortContent = content && content.substring(0, MAX_REVIEW_CONTENT);
-
+    const  {author, url} = props.review;
+    const review = props.review;
+  
     return (
         <div className="md-paragraph movie-review">
             <div className="movie-review-author">
                 <i> {author}</i>
             </div>
             <div className="movie-review-content">
-                {shortContent}
-                {showMore ? (<a href={url} rel="noopener noreferrer" target='_blank'>...</a>) : null}
+                {review.getReviewDescription()}
+                {review.canShowMore() ? (<a href={url} rel="noopener noreferrer" target='_blank'>...</a>) : null}
             </div>
         </div>
     )
+}
+
+MovieReview.propTypes = {
+    review: PropTypes.instanceOf(Review)
 }
 
 export default MovieReview;

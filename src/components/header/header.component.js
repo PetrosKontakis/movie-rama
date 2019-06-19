@@ -1,6 +1,7 @@
 import React from 'react';
 import './header.component.style.scss';
 import SearchBox from '../search-box/searchBox.component';
+import PropTypes from 'prop-types';
 
 /**
  * Name: Header
@@ -29,6 +30,10 @@ const Header = (props) => {
         </div>
 
     )
+}
+
+Header.propTypes = {
+    onSearchQueryChange: PropTypes.func.isRequired
 }
 
 export default Header;

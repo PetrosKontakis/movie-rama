@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+import PropTypes from 'prop-types';
 import './searchBox.component.style.scss';
 
 const DELAY = 600;
@@ -15,6 +15,10 @@ class SearchBox extends Component {
     }
 
     timer;
+
+    componentWillUnmmount(){
+        clearTimeout(this.timer);
+    }
 
     handleSubmit = (e) => {
         e.preventDefault();
@@ -50,6 +54,10 @@ class SearchBox extends Component {
             </form>
         )
     }
+}
+
+SearchBox.propTypes = {
+    onQueryChange: PropTypes.func.isRequired
 }
 
 export default SearchBox;

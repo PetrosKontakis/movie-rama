@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { getMovieVideos } from '../../services/httpActions.service';
-import MovieTrailer, {MovieTrailerGhost} from '../movie-trailer/movieTrailer.component';
+import MovieTrailer, { MovieTrailerGhost } from '../movie-trailer/movieTrailer.component';
+import PropTypes from 'prop-types';
+import Trailer from '../../services/models/trailer.model';
 import "./movieTrailerContainer.component.style.scss"
 
 const VIEW_STATES = {
@@ -34,7 +36,7 @@ class MovieTrailerContainer extends Component {
                 }
                 return this.setState({
                     viewState: VIEW_STATES.NORMAL,
-                    trailers: response.results,
+                    trailers: response.results.map(tr=> new Trailer(tr)),
                     canShowMore
                 })
             }
@@ -68,8 +70,12 @@ class MovieTrailerContainer extends Component {
             <React.Fragment>
 
                 <div className="movie-trailer-container">
-                    {trailers ? trailers.slice(0, trailerToShowIndex).map(trailer => (<MovieTrailer trailer={trailer} key={trailer.id}></MovieTrailer>)) : null}
+                    {trailers ? trailers.slice(0, trailerToShowIndex).map(trailer => (
+                        <MovieTrailer trailer={trailer} key={trailer.id}></MovieTrailer>
+                    )
+                    ) : null}
                 </div>
+                <div className="clear-fix"></div>
                 <div className="md-container">
                     {canShowMore ? (<button className="md-button-primary" onClick={this.showAll}>Show all</button>) : null}
                 </div>
@@ -105,6 +111,10 @@ class MovieTrailerContainer extends Component {
         }
         return;
     }
+}
+
+MovieTrailerContainer.propTypes = {
+    movieId: PropTypes.number.isRequired
 }
 
 export default MovieTrailerContainer;

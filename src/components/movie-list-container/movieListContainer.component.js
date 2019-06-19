@@ -1,32 +1,39 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+
 
 import MovieListItem, { MovieListItemGhost } from '../movie-list-item/movieListItem.component';
 import MovieDetails from '../movie-details/movieDetails.component';
-import { getNowPlayingMoviesPaged, searchMovie, getMovieSimilar } from '../../services/httpActions.service';
+import Movie from '../../services/models/movie.model';
 
+// Export fetch types
+export const FETCH_TYPES = {
+    SEARCH: 'SEARCH',
+    NOW_PLAYING: 'NOW_PLAYING',
+    SIMILAR_MOVIES: 'SIMILAR_MOVIES',
+}
 
 /**
  * Available view states
  */
 const VIEW_STATES = {
-    SEARCH_VIEW: 0,
-    NOW_PLAYING_VIEW: 1,
-    SIMILAR_MOVIES_VIEW: 2,
+    NORMAL_VIEW: 0,
+    LOADING: 1,
     SERVER_ERROR: 4,
     NO_RESULTS: 5
 }
 
+/**
+ * Inital state
+ */
 const INITIAL_STATE = {
     viewState: VIEW_STATES.NOW_PLAYING_VIEW,
-    loading: false,
-    errorMessage: '',
     currentPage: 1,
     totalPages: null,
     totalResults: null,
     query: '',
     similarMovieId: null,
     movies: [],
-    selectedMovieIndex: 0,
     selectedMovie: null,
     selectedMoviePosition: null
 
@@ -49,28 +56,20 @@ const GRID_LAYOUT_PATTERN = [
  * representation 
  * 
  */
+
+ 
 class MovieListContainer extends Component {
+
 
     //  Set up initial state
     state = INITIAL_STATE;
 
 
 
-
-
     // On component mount execute http request
     componentDidMount() {
-
         this.props.onRef(this)
-
-        var newState = this.state;
-        if (this.props.similarMovieId) {
-            newState['similarMovieId'] = this.props.similarMovieId;
-            newState['viewState'] = VIEW_STATES.SIMILAR_MOVIES_VIEW
-        }
-        this.setState(newState, () => {
-            this.getMovies();
-        })
+        this.fetchDate();
     }
 
     componentWillUnmount() {
@@ -78,90 +77,59 @@ class MovieListContainer extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-
-
-
-        if (this.state.viewState === VIEW_STATES.SIMILAR_MOVIES_VIEW) {
-            return;
-        }
-        if (nextProps.query != null && nextProps.query !== '') {
-
-            let newState = {
-
-                ...INITIAL_STATE,
-                viewState: VIEW_STATES.SEARCH_VIEW,
-                query: nextProps.query
-            }
-
-            this.setState(newState, () => this.getMovies());
-        } else {
-            this.setState(INITIAL_STATE, () => this.getMovies());
-        }
-
-
+        this.setState(INITIAL_STATE, () => this.fetchDate());
     }
 
     // This function execute http request
-    getMovies = () => {
+    fetchDate = () => {
 
-        this.setState({ loading: true });
+        this.setState({ viewState: VIEW_STATES.LOADING });
+        const params = { ...this.props.fetchParams, page: this.state.currentPage }
+        this.props.fetchFunc(params)
+            .then(this.handleFetchSuccess)
+            .catch(this.handleFetchError)
 
-        if (this.state.viewState === VIEW_STATES.SEARCH_VIEW) {
-            searchMovie(this.state.query, this.state.currentPage)
-                .then(this.handleGetMoviesSuccess)
-                .catch(this.handleGetMoviesError)
-        } else if (this.state.viewState === VIEW_STATES.SIMILAR_MOVIES_VIEW) {
-            getMovieSimilar(this.state.similarMovieId, this.state.currentPage)
-                .then(this.handleGetMoviesSuccess)
-                .catch(this.handleGetMoviesError)
-        } else {
-            getNowPlayingMoviesPaged(this.state.currentPage)
-                .then(this.handleGetMoviesSuccess)
-                .catch(this.handleGetMoviesError)
-
-        }
 
     }
 
-    handleGetMoviesSuccess = response => {
-        const movies = [...this.state.movies, ...response.results];
-
-        let newState = {
-            movies,
-            loading: false,
-            totalResults: response.total_results,
-            totalPages: response.total_pages
-        };
+    handleFetchSuccess = response => {
 
         if (response.total_results === 0) {
-            newState['viewState'] = VIEW_STATES.NO_RESULTS
+            return this.setState({ viewState: VIEW_STATES.NO_RESULTS })
         }
 
-        this.setState(newState)
-    }
+        const movies = [
+            ...this.state.movies, 
+            ...response.results.map(res=> new Movie(res))];
 
-    handleGetMoviesError = error => {
         this.setState({
-            viewState: VIEW_STATES.SERVER_ERROR,
-            loading: false,
-            error: error.error
+            movies,
+            totalResults: response.total_results,
+            totalPages: response.total_pages,
+            viewState: VIEW_STATES.NORMAL_VIEW
         })
     }
 
-    //  Increase currentPage and execute http getMovies
+    handleFetchError = error => {
+        this.setState({
+            viewState: VIEW_STATES.SERVER_ERROR
+        })
+    }
+
+    //  Increase currentPage and execute http fetchDate
     getNextPage = () => {
-        console.log("getNextPage executed")
+
         //  Check if exist next page first
         const { totalPages, currentPage } = this.state;
         if (totalPages && currentPage >= totalPages) {
             //  No results to show
             return;
         }
-        //  Set currentPage on state and execute getMovies 
+        //  Set currentPage on state and execute fetchDate 
         this.setState((state, props) => ({
             currentPage: state.currentPage + 1,
         }), () => {
-            this.getMovies();
+            this.fetchDate();
         })
     }
 
@@ -177,15 +145,12 @@ class MovieListContainer extends Component {
 
     onMovieSelect = (movie, moviePosition) => {
         this.setState({
-
-            selectedMovieIndex: this.state.selectedMovieIndex + 1,
             selectedMovie: movie,
             selectedMoviePosition: moviePosition
         })
     }
 
     deselectMovie = () => {
-
         this.setState({
             selectedMovie: INITIAL_STATE.selectedMovie,
             selectedMoviePosition: INITIAL_STATE.selectedMoviePosition
@@ -193,12 +158,12 @@ class MovieListContainer extends Component {
     }
 
     renderSelectedMovie = () => {
-        if (this.state.selectedMovie !== null) {
+        const { selectedMovie, selectedMoviePosition } = this.state;
+        if (selectedMovie !== null) {
             return (
                 <MovieDetails
-                    count={this.state.selectedMovieIndex}
-                    movie={this.state.selectedMovie}
-                    starterPosition={this.state.selectedMoviePosition}
+                    movie={selectedMovie}
+                    starterPosition={selectedMoviePosition}
                     onMovieDetailsClose={this.deselectMovie}>
                 </MovieDetails>
             )
@@ -206,64 +171,24 @@ class MovieListContainer extends Component {
         return null;
     }
 
-    render() {
-
-        const {
-            loading,
-            movies,
-            viewState,
-            totalResults,
-            query,
-            error
-        } = this.state;
-
-        // Server error state
-        if (viewState === VIEW_STATES.SERVER_ERROR) {
-            return (
-                <div className="md-container">
-
-                    <div className="md-sub-title">
-                        Server Error
-                    </div>
-                    <p>
-                        Message: {error}
-                    </p>
-                </div>
+    renderGhostLoading = (isLoading) => {
+        if (isLoading) {
+            return (GRID_LAYOUT_PATTERN.map((size, key) => (
+                <MovieListItemGhost key={key}></MovieListItemGhost>))
             )
         }
-        // No results state
-        if (viewState === VIEW_STATES.NO_RESULTS) {
-            return (
-                <div className="md-container">
+        return null;
+    }
+    
+    renderNormal = (isLoading) => {
 
-                    <div className="md-sub-title">
-                        No results Found...
-                    </div>
-                    <p>
-                        There are no movies that matched your query.
-                    </p>
-                </div>
-            )
-        }
+        const { movies } = this.state;
 
-        // Normal state
         return (
             <React.Fragment>
-                {/* Render selected movie */}
+
                 {this.renderSelectedMovie()}
 
-
-                <div className="md-container no-gutters">
-
-                    <div className="md-sub-title">
-                        {viewState === VIEW_STATES.NOW_PLAYING_VIEW ? 'Now In Theaters' : null}
-                        {viewState === VIEW_STATES.SEARCH_VIEW ? (
-                            <React.Fragment>
-                                Search for '{query}' <i><small>total results: {totalResults}</small></i>
-                            </React.Fragment>
-                        ) : null}
-                    </div>
-                </div>
                 <div className="md-container no-gutters">
                     <div className="md-list">
                         {movies.map(
@@ -278,22 +203,63 @@ class MovieListContainer extends Component {
                             }
                         )}
 
-                        {loading ?
-                            GRID_LAYOUT_PATTERN.map((size, key) => (
-                                <MovieListItemGhost key={key}></MovieListItemGhost>))
-                            : null}
+                        {this.renderGhostLoading(isLoading)}
+
 
                         <div className="clear-fix"></div>
                     </div>
                 </div>
-
-                <div className="text-center">
+                {isLoading ? (<div className="text-center">
                     <button className="md-button" onClick={this.handleLoadMore}>Loading...</button>
-                </div>
+                </div>) : null}
+
             </React.Fragment>
 
         );
     }
+    renderServerError = () => {
+        return (
+            <div className="md-container no-gutters">
+                <div className="md-paragraph">
+                    Server Error! Something went wrong. Please try again later..
+                </div>
+            </div>
+        )
+    }
+    renderNoResults = () => {
+        return (
+            <div className="md-container no-gutters">
+                <div className="md-paragraph">
+                    No results Found...
+                </div>
+            </div>
+        )
+    }
+
+
+    render() {
+
+        const { viewState } = this.state;
+
+        // Server error state
+        if (viewState === VIEW_STATES.SERVER_ERROR) {
+            return this.renderServerError()
+        }
+        // No results state
+        if (viewState === VIEW_STATES.NO_RESULTS) {
+            return this.renderNoResults();
+        }
+
+        // Normal state
+        return this.renderNormal(viewState === VIEW_STATES.LOADING);
+    }
 }
+
+MovieListContainer.propTypes = {
+    fetchType: PropTypes.string,
+    fetchFunc: PropTypes.func.isRequired,
+    fetchParams: PropTypes.object
+}
+
 
 export default MovieListContainer;

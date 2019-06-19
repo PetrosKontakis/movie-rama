@@ -1,6 +1,13 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+
+import Movie from '../../services/models/movie.model';
+import ElementPosition from '../../services/models/elementPosition.model';
+
+
 import MovieReviewContainer from '../movie-review-container/movieReviewContainer.component';
-import MovieListContainer from '../movie-list-container/movieListContainer.component';
+import MovieListContainer, { FETCH_TYPES } from '../movie-list-container/movieListContainer.component';
+import { getMovieSimilar } from '../../services/httpActions.service';
 import MovieTrailerContainer from '../movie-trailer-container/movieTrailerContainer.component';
 import backIcon from '../../images/baseline-keyboard_arrow_left-24px.svg'
 import './movieDetails.component.style.scss';
@@ -12,7 +19,6 @@ const FULL_WIDTH_POSITION = {
     left: 0,
     width: '100vw',
     height: '100vh',
-
 }
 
 class MovieDetails extends Component {
@@ -26,6 +32,8 @@ class MovieDetails extends Component {
 
     timerAnimationIn = null;
 
+    timerAnimationOut = null;
+
     componentWillMount() {
 
         this.setState({
@@ -36,11 +44,9 @@ class MovieDetails extends Component {
         })
 
         this.timerAnimationIn = setTimeout(() => this.setState({
-            position: FULL_WIDTH_POSITION,
+            position: new ElementPosition(FULL_WIDTH_POSITION),
             isFullScreen: true
         }))
-
-
     }
 
     componentWillUnmount() {
@@ -71,8 +77,8 @@ class MovieDetails extends Component {
 
     render() {
         const { position, movie, isFullScreen } = this.state;
-        const posterCoverSrc = `https://image.tmdb.org/t/p/w1400_and_h450_face/${movie.poster_path}`
-        const posterPreviewSrc = `https://image.tmdb.org/t/p/w116_and_h174_face/${movie.poster_path}`
+        const posterCoverSrc = movie.getCover();
+        const posterPreviewSrc = movie.getPreviewPoster();
         return (
             <div
                 style={position}
@@ -97,10 +103,8 @@ class MovieDetails extends Component {
                     </div>
                     <div className="md-container mv-details-content-card">
 
-
-
                         <div className={`mv-details-movie-content ${isFullScreen ? 'show' : 'hide'}`}>
-                            <div className="md-contaier no-gutters">
+                            <div className="md-container no-gutters">
                                 <div className="poster-preview-container">
                                     <img src={posterPreviewSrc} alt={movie.title} />
                                 </div>
@@ -116,7 +120,7 @@ class MovieDetails extends Component {
                                 </div>
 
                                 <div className="md-paragraph sub-info">
-                                    {movie.release_date}, Rating {movie.vote_average}
+                                    {movie.getHumanDate()}, Rating {movie.voteAverage}
                                 </div>
 
 
@@ -137,8 +141,10 @@ class MovieDetails extends Component {
                                 </div>
                             </div>
                             <MovieListContainer
-                                onRef={ref => (this.movieList = ref)}
-                                similarMovieId={movie.id}></MovieListContainer>
+                                fetchType={FETCH_TYPES.SIMILAR_MOVIES}
+                                fetchFunc={getMovieSimilar}
+                                fetchParams={{ movie_id: movie.id }}
+                                onRef={ref => (this.movieList = ref)}></MovieListContainer>
 
                         </div>
                     </div>
@@ -147,6 +153,12 @@ class MovieDetails extends Component {
             </div>
         )
     }
+}
+
+MovieDetails.propTypes = {
+    movie: PropTypes.instanceOf(Movie),
+    starterPosition: PropTypes.instanceOf(ElementPosition),
+    onMovieDetailsClose: PropTypes.func.isRequired
 }
 
 export default MovieDetails;

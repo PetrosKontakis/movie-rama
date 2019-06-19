@@ -1,7 +1,15 @@
 import React, { Component } from 'react';
+
 import './movieListItem.component.style.scss';
 import store, { EVENTS } from '../../services/store.service';
+import ElementPosition from '../../services/models/elementPosition.model';
+import Movie from '../../services/models/movie.model';
+import PropTypes from 'prop-types';
 
+/**
+ * Name: MovieListItemGhost
+ * Description:  Empty movie list item for loading view
+ */
 export const MovieListItemGhost = () => {
     return (
         <div className="mv-masonry-grid mv-masonry-sm">
@@ -41,82 +49,69 @@ class MovieListItem extends Component {
     }
 
     setGenreNames(genreList) {
-        const { genre_ids } = this.props.movie;
+        const { genreIds } = this.props.movie;
         const genreNames = genreList.filter((genre) => {
-            return genre_ids.includes(genre.id);
+            return genreIds.includes(genre.id);
         }).map(genre => genre.name);
         this.setState({ genreNames });
     }
 
-
-    getMovieProps = () => {
-        return {
-            size: this.props.size,
-            overview: this.props.movie.overview,
-            imgSrc: `https://image.tmdb.org/t/p/w500/${this.props.movie.poster_path}`,
-            title: this.props.movie.title,
-            genre: this.state.genreNames.join(', '),
-            releaseDate: this.props.movie.release_date,
-            voteAverage: this.props.movie.vote_average
-        }
-    }
-
-
     getOffset = (el) => {
         const rect = el.getBoundingClientRect();
-        return {
+        return new ElementPosition({
             top: rect.top,
             left: rect.left,
             right: rect.left + el.offsetWidth,
             bottom: rect.top + el.offsetHeight,
             width: el.offsetWidth,
             height: el.offsetHeight
-        }
+        })
     }
 
     render() {
 
-        const {
-            size,
-            overview,
-            imgSrc,
-            title,
-            genre,
-            releaseDate,
-            voteAverage } = this.getMovieProps();
+        const {size, movie} = this.props;
+        const genre = this.state.genreNames.join(", ");
 
         return (
             <div
-                className={`mv-masonry-grid mv-masonry-${size}`} title={overview}>
+                className={`mv-masonry-grid mv-masonry-${size}`} title={movie.overview}>
                 <div
                     onClick={this.handleCardClick}
                     className={`mv-card  mv-card-${size}`}>
-                        <div className="mv-card-poster"
-                            style={{ backgroundImage: `url(${imgSrc})` }}>
+                    <div className="mv-card-poster"
+                        style={{ backgroundImage: `url(${movie.getMdPoster()})` }}>
+                    </div>
+                    <div className="mv-card-content">
+                        <div className="title">
+                            {movie.title}
                         </div>
-                        <div className="mv-card-content">
-                            <div className="title">
-                                {title}
-                            </div>
-                            <div className="genre">
-                                {genre}
-                            </div>
-                            <div className="overview">
-                                {overview}
-                            </div>
+                        <div className="genre">
+                            {genre}
                         </div>
-                        <div className="mv-card-footer">
-                            <div className="md-block-left">
-                                {releaseDate}
-                            </div>
-                            <div className="md-block-right text-right">
-                                Rate: {voteAverage}
-                            </div>
+                        <div className="overview">
+                            {movie.getOverviewDesc()}
                         </div>
+                    </div>
+                    <div className="mv-card-footer">
+                        <div className="md-block-left">
+                            {movie.getHumanDate()}
+                        </div>
+                        <div className="md-block-right text-right">
+                            Rate: {movie.voteAverage}
+                        </div>
+                    </div>
                 </div>
             </div>
         )
     }
 }
+
+MovieListItem.propTypes = {
+    size: PropTypes.string,
+    onMovieSelect: PropTypes.func.isRequired,
+    movie: PropTypes.instanceOf(Movie)
+}
+
 
 export default MovieListItem;

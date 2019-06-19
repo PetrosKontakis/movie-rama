@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import MovieReview, {MovieRevieGhost} from '../movie-review/movieReview.component';
+import MovieReview, {MovieReviewGhost} from '../movie-review/movieReview.component';
 import { getMovieReviews } from '../../services/httpActions.service';
+import Review from '../../services/models/review.model';
+import PropTypes from 'prop-types'
 
 const VIEW_STATES = {
     LOADING: 0,
@@ -22,7 +24,10 @@ class MovieReviewContainer extends Component {
         getMovieReviews(this.props.movieId).then(
             response => {
                 if (response.total_results > 0) {
-                    this.setState({ viewState: VIEW_STATES.NORMAL, reviews: response.results })
+                    this.setState({ 
+                        viewState: VIEW_STATES.NORMAL, 
+                        reviews: response.results.map(re => new Review(re)) 
+                    })
                 }
                 else {
                     this.setState({ viewState: VIEW_STATES.NO_RESULTS })
@@ -40,7 +45,7 @@ class MovieReviewContainer extends Component {
     renderLoading = () => {
         return (
             <div className="md-paragraph">
-                <MovieRevieGhost></MovieRevieGhost>
+                <MovieReviewGhost></MovieReviewGhost>
             </div>
         )
     }
@@ -56,7 +61,7 @@ class MovieReviewContainer extends Component {
     renderNoResults = () => {
         return (
             <div className="md-paragraph">
-                No reviews found for this movie,
+                No reviews found for this movie.
             </div>
         )
     }
@@ -87,6 +92,10 @@ class MovieReviewContainer extends Component {
             return this.renderNormal();
         }
     }
+}
+
+MovieReviewContainer.propTypes = {
+    movieId: PropTypes.number.isRequired
 }
 
 export default MovieReviewContainer;
