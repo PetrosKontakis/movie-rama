@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import MovieListItem from '../movie-list-item/movieListItem.component';
 import MovieDetails from '../movie-details/movieDetails.component';
-import { getNowPlayingMoviesPaged,  searchMovie, getMovieSimilar } from '../../services/httpActions.service';
+import { getNowPlayingMoviesPaged, searchMovie, getMovieSimilar } from '../../services/httpActions.service';
 
 
 /**
@@ -253,31 +253,36 @@ class MovieListContainer extends Component {
                 {this.renderSelectedMovie()}
 
 
-                <div className="md-sub-title">
-                    {viewState === VIEW_STATES.NOW_PLAYING_VIEW ? 'Now In Theaters' : null}
-                    {viewState === VIEW_STATES.SEARCH_VIEW ? (
-                        <React.Fragment>
-                            Search for '{query}' <i><small>total results: {totalResults}</small></i>
-                        </React.Fragment>
-                    ) : null}
-                </div>
-                <div className="md-list">
-                    {movies.map(
-                        (movie, key) => {
-                            return (
-                                <MovieListItem
-                                    onMovieSelect={this.onMovieSelect}
-                                    size={this.getMovieSizeFromPattern(key)}
-                                    movie={movie}
-                                    key={key}></MovieListItem>
-                            )
-                        }
-                    )}
+                <div className="md-container no-gutters">
 
-                    {loading ?
-                        GRID_LAYOUT_PATTERN.map((size, key) => (
-                            <MovieListItem ghostMovie={true} size={size} key={key}></MovieListItem>))
-                        : null}
+                    <div className="md-sub-title">
+                        {viewState === VIEW_STATES.NOW_PLAYING_VIEW ? 'Now In Theaters' : null}
+                        {viewState === VIEW_STATES.SEARCH_VIEW ? (
+                            <React.Fragment>
+                                Search for '{query}' <i><small>total results: {totalResults}</small></i>
+                            </React.Fragment>
+                        ) : null}
+                    </div>
+                </div>
+                <div className="md-container no-gutters">
+                    <div className="md-list">
+                        {movies.map(
+                            (movie, key) => {
+                                return (
+                                    <MovieListItem
+                                        onMovieSelect={this.onMovieSelect}
+                                        size={this.getMovieSizeFromPattern(key)}
+                                        movie={movie}
+                                        key={key}></MovieListItem>
+                                )
+                            }
+                        )}
+                        <div className="clear-fix"></div>
+                        {loading ?
+                            GRID_LAYOUT_PATTERN.map((size, key) => (
+                                <MovieListItem ghostMovie={true} size={size} key={key}></MovieListItem>))
+                            : null}
+                    </div>
                 </div>
 
                 <div className="text-center">

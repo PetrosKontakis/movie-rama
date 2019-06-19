@@ -44,9 +44,9 @@ class MovieDetails extends Component {
     }
 
     componentWillUnmount() {
+        //  Clear animation timers
         clearTimeout(this.timerAnimationIn);
         clearTimeout(this.timerAnimationOut);
-
     }
 
 
@@ -98,43 +98,45 @@ class MovieDetails extends Component {
                     <div className="md-container mv-details-content-card">
 
 
+
                         <div className={`mv-details-movie-content ${isFullScreen ? 'show' : 'hide'}`}>
+                            <div className="md-contaier no-gutters">
+                                <div className="poster-preview-container">
+                                    <img src={posterPreviewSrc} alt={movie.title} />
+                                </div>
 
-                            <div className="poster-preview-container">
-                                <img src={posterPreviewSrc} alt={movie.title} />
-                            </div>
+                                <div className="md-title">
+                                    {movie.title}
+                                </div>
+                                <div className="md-sub-title">
+                                    Overview
+                                </div>
+                                <div className="md-paragraph">
+                                    {movie.overview}
+                                </div>
 
-                            <div className="md-title">
-                                {movie.title}
-                            </div>
-                            <div className="md-sub-title">
-                                Overview
-                        </div>
-                            <div className="md-paragraph">
-                                {movie.overview}
-                            </div>
-
-                            <div className="md-paragraph sub-info">
-                                {movie.release_date}, Rating {movie.vote_average}
-                            </div>
+                                <div className="md-paragraph sub-info">
+                                    {movie.release_date}, Rating {movie.vote_average}
+                                </div>
 
 
-                            <div className="md-sub-title">
-                                Trailers
-                        </div>
-                            <div className="horizontal-container">
-                                <MovieTrailerContainer movieId={movie.id}></MovieTrailerContainer>
+                                <div className="md-sub-title">
+                                    Trailers
+                                </div>
+                                <div className="horizontal-container">
+                                    <MovieTrailerContainer movieId={movie.id}></MovieTrailerContainer>
+                                </div>
+                                <div className="md-sub-title">
+                                    Reviews
+                                </div>
+                                <div>
+                                    <MovieReviewContainer movieId={movie.id}></MovieReviewContainer>
+                                </div>
+                                <div className="md-sub-title">
+                                    Similar movies
+                                </div>
                             </div>
-                            <div className="md-sub-title">
-                                Reviews
-                        </div>
-                            <div>
-                                <MovieReviewContainer movieId={movie.id}></MovieReviewContainer>
-                            </div>
-                            <div className="md-sub-title">
-                                Similar movies
-                        </div>
-                            <MovieListContainer 
+                            <MovieListContainer
                                 onRef={ref => (this.movieList = ref)}
                                 similarMovieId={movie.id}></MovieListContainer>
 
