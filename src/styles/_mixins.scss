@@ -27,6 +27,23 @@
   text-overflow: ellipsis;
 }
 
+@mixin clearFix(){
+  &:after{
+    // clear fix
+    content: "";
+    clear: both;
+    display: table;
+  }
+}
+
+@mixin inheritButton(){
+  cursor: pointer;
+  border: 0;
+  color: inherit;
+  background: none;
+  padding: 0px;
+}
+
 
 @mixin gradientAnimation($color1, $color2) {
   animation-duration: 1.8s;

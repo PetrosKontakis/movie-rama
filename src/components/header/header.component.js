@@ -11,7 +11,7 @@ import SearchBox from '../search-box/searchBox.component';
 const Header = (props) => {
 
     const headerContentTemplate = (
-        <div className="md-container">
+        <div>
             <div className="brand-name">
                 MovieRama
             </div>
@@ -22,7 +22,9 @@ const Header = (props) => {
         <div className="md-header header-component-container">
             {headerContentTemplate}
             <div className="md-header-content-fixed header-component-container-fixed">
-                {headerContentTemplate}
+                <div className="md-container no-gutters">
+                    {headerContentTemplate}
+                </div>
             </div>
         </div>
 
