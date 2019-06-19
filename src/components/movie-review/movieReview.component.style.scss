@@ -1,3 +1,5 @@
+@import "../../styles/mixins";
+@import "../../styles/variables";
 .movie-review {
   padding-left: 32px;
   .movie-review-author {
@@ -7,5 +9,16 @@
   }
   .movie-review-content {
     font-size: 14px;
+  }
+
+  &.ghost {
+    .movie-review-author,
+    .movie-review-content {
+      height: 16px;
+      @include gradientAnimation($background-color-secondary, white);
+    }
+    .movie-review-author{
+      width: 98px;
+    }
   }
 }

@@ -5,11 +5,15 @@ const MAX_REVIEW_CONTENT = 250;
 const MovieReview = (props) => {
 
     const { author, content, url } = props.review
+    const { isGhost } = props;
 
-    const showMore = content.length > MAX_REVIEW_CONTENT;
-    const shortContent = content.substring(0, MAX_REVIEW_CONTENT);
+    
+    const showMore = content && content.length > MAX_REVIEW_CONTENT;
+    const shortContent = content && content.substring(0, MAX_REVIEW_CONTENT);
+    const ghostClass = isGhost ? 'ghost' : '';
+
     return (
-        <div className="md-paragraph movie-review">
+        <div className={`md-paragraph movie-review ${ghostClass}`}>
 
             <div className="movie-review-author">
 

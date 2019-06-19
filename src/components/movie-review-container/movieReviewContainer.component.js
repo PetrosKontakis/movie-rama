@@ -40,7 +40,7 @@ class MovieReviewContainer extends Component {
     renderLoading = () => {
         return (
             <div className="md-paragraph">
-                loading...
+                <MovieReview isGhost="true" review={{}}></MovieReview>
             </div>
         )
     }
