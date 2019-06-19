@@ -15,7 +15,8 @@ class MovieTrailerContainer extends Component {
     state = {
         viewState: null,
         trailers: null,
-        
+        trailerToShowIndex: 2,
+        canShowMore: false
     }
 
     componentWillMount() {
@@ -26,7 +27,16 @@ class MovieTrailerContainer extends Component {
                 if (response.results && response.results.length === 0) {
                     return this.setState({ viewState: VIEW_STATES.NO_RESULTS })
                 }
-                return this.setState({ viewState: VIEW_STATES.NORMAL, trailers: response.results })
+
+                let canShowMore;
+                if (response.results && response.results.length > this.state.trailerToShowIndex) {
+                    canShowMore = true;
+                }
+                return this.setState({
+                    viewState: VIEW_STATES.NORMAL,
+                    trailers: response.results,
+                    canShowMore
+                })
             }
         ).catch(
             error => {
@@ -35,16 +45,38 @@ class MovieTrailerContainer extends Component {
         )
     }
 
-    renderLoading = () => {
-        return (<div className="md-paragraph">loading...</div>);
+    showAll = () => {
+        const { trailers } = this.state;
+        const newState = {
+            canShowMore: false,
+            trailerToShowIndex: trailers.length
+        }
+        this.setState(newState)
     }
 
-    renderNormal = () => {
-        const { trailers } = this.state;
+    renderLoading = () => {
+        //  Preview on ghost movie trailer
         return (
-            <div className="movie-trailer-container">
-                {trailers ? trailers.map(trailer => (<MovieTrailer trailer={trailer} key={trailer.id}></MovieTrailer>)) : null}
-            </div>
+            <MovieTrailer trailer={{}} isGhost={true}></MovieTrailer>
+        );
+    }
+
+
+    renderNormal = () => {
+        const { trailers, canShowMore, trailerToShowIndex } = this.state;
+        return (
+            <React.Fragment>
+
+                <div className="movie-trailer-container">
+                    {trailers ? trailers.slice(0, trailerToShowIndex).map(trailer => (<MovieTrailer trailer={trailer} key={trailer.id}></MovieTrailer>)) : null}
+                </div>
+                <div className="md-container">
+                    {canShowMore ? (<button className="md-button-primary" onClick={this.showAll}>Show all</button>) : null}
+                </div>
+
+            </React.Fragment>
+
+
         );
     }
 

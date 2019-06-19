@@ -28,4 +28,11 @@
         color: white;
         font-weight: 800;
     }
+
+    &.ghost{
+        @include gradientAnimation($background-color-secondary, white);
+        .overlay, .content{
+            display: none;
+        }
+    }
 }
