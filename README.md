@@ -1,7 +1,7 @@
 # MovieRama
 
 ## Available demo
-working [https://petroskontakis.github.io/movie-rama/](demo)
+working [demo](https://petroskontakis.github.io/movie-rama/)
 
 
 ## Scripts
