@@ -29,6 +29,7 @@
 }
 .mv-details-poster {
   width: 100%;
+  min-height: 150px;
   padding-top: 24%;
   margin-top: 60px;
   @include transition();

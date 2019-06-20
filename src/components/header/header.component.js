@@ -23,7 +23,7 @@ const Header = (props) => {
         <div className="md-header header-component-container">
             {headerContentTemplate}
             <div className="md-header-content-fixed header-component-container-fixed">
-                <div className="md-container no-gutters">
+                <div className="md-container">
                     {headerContentTemplate}
                 </div>
             </div>
