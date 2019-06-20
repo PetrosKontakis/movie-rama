@@ -1,5 +1,7 @@
+import {subStringParagraph} from '../util.service';
 
 const MAX_REVIEW_CONTENT = 250;
+
 class Review {
     constructor({ author, content, id, url }) {
         this.author = author;
@@ -8,7 +10,7 @@ class Review {
         this.url = url;
     }
     getReviewDescription() {
-        return this.content && this.content.substring(0, MAX_REVIEW_CONTENT);
+        return subStringParagraph(this.content,  MAX_REVIEW_CONTENT);
     }
 
     canShowMore() {

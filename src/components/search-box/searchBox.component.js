@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import './searchBox.component.style.scss';
+import {SEARCH_INPUT_DELAY} from  '../../services/config';
 
-const DELAY = 600;
 
 /**
  * Name: SearchBox
@@ -31,7 +31,7 @@ class SearchBox extends Component {
         clearTimeout(this.timer);
         this.setState({
             searchQuery: e.target.value
-        }, () => this.timer = setTimeout(this.notifyOnQueryChange, DELAY))
+        }, () => this.timer = setTimeout(this.notifyOnQueryChange, SEARCH_INPUT_DELAY))
     }
 
     notifyOnQueryChange = () => {

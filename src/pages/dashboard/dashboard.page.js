@@ -11,9 +11,7 @@ class DashBoardPage extends Component {
     }
 
     handleOnQueryChange = (movieQuery) => {
-
         const isSearchView = movieQuery != null && movieQuery !== "";
-
         this.setState({ movieQuery, isSearchView });
     }
 

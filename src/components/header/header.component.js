@@ -19,6 +19,7 @@ const Header = (props) => {
             <SearchBox onQueryChange={props.onSearchQueryChange}></SearchBox>
         </div>
     )
+    
     return (
         <div className="md-header header-component-container">
             {headerContentTemplate}

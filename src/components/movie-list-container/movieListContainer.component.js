@@ -24,19 +24,16 @@ const VIEW_STATES = {
 }
 
 /**
- * Inital state
+ * Initial state
  */
 const INITIAL_STATE = {
     viewState: VIEW_STATES.NOW_PLAYING_VIEW,
     currentPage: 1,
     totalPages: null,
     totalResults: null,
-    query: '',
-    similarMovieId: null,
     movies: [],
     selectedMovie: null,
     selectedMoviePosition: null
-
 }
 
 const GRID_LAYOUT_PATTERN = [
@@ -56,15 +53,11 @@ const GRID_LAYOUT_PATTERN = [
  * representation 
  * 
  */
-
- 
 class MovieListContainer extends Component {
 
 
     //  Set up initial state
     state = INITIAL_STATE;
-
-
 
     // On component mount execute http request
     componentDidMount() {
@@ -82,25 +75,26 @@ class MovieListContainer extends Component {
 
     // This function execute http request
     fetchDate = () => {
-
+        //  set loading view state
         this.setState({ viewState: VIEW_STATES.LOADING });
+        //  compose fetch parameters
         const params = { ...this.props.fetchParams, page: this.state.currentPage }
+        //  Execute fetch
         this.props.fetchFunc(params)
             .then(this.handleFetchSuccess)
             .catch(this.handleFetchError)
-
-
     }
 
     handleFetchSuccess = response => {
 
+        //  Set no results view state
         if (response.total_results === 0) {
             return this.setState({ viewState: VIEW_STATES.NO_RESULTS })
         }
-
+        //  Set Normal view
         const movies = [
-            ...this.state.movies, 
-            ...response.results.map(res=> new Movie(res))];
+            ...this.state.movies,
+            ...response.results.map(res => new Movie(res))];
 
         this.setState({
             movies,
@@ -111,6 +105,11 @@ class MovieListContainer extends Component {
     }
 
     handleFetchError = error => {
+        // If request canceled by user return
+        if (error.abort) {
+            return;
+        }
+        //  Set view state to server error
         this.setState({
             viewState: VIEW_STATES.SERVER_ERROR
         })
@@ -118,9 +117,8 @@ class MovieListContainer extends Component {
 
     //  Increase currentPage and execute http fetchDate
     getNextPage = () => {
-
-        //  Check if exist next page first
         const { totalPages, currentPage } = this.state;
+        //  Check if exist next page first
         if (totalPages && currentPage >= totalPages) {
             //  No results to show
             return;
@@ -179,7 +177,7 @@ class MovieListContainer extends Component {
         }
         return null;
     }
-    
+
     renderNormal = (isLoading) => {
 
         const { movies } = this.state;

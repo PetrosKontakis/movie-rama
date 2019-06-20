@@ -13,13 +13,13 @@
   margin: auto;
   padding: 0 16px;
   box-sizing: border-box;
- 
-  &.no-gutters{
+
+  &.no-gutters {
     padding: 0;
   }
 }
 
-.clear-fix{
+.clear-fix {
   @include clearFix();
 }
 
@@ -77,7 +77,6 @@
   padding: 8px;
   font-size: 24px;
   font-weight: 500;
-
 }
 .md-sub-title {
   padding: 8px;

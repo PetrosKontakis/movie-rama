@@ -1,8 +1,16 @@
 
 export const EVENTS = {
-    GENRE_LIST_RECEIVED: 'GENRE_LIST_RECEIVED'
+    GENRE_LIST_RECEIVED: 'GENRE_LIST_RECEIVED',
+    HTTP_ABOARD: 'HTTP_ABOARD'
 }
 
+/**
+ * Service that keeping event base data
+ * How to user:
+ *    1. Add `store.onStoreChange('eventName', callback)` in place that needed 
+ *      data listener.
+ *    2. Broadcast event when data received by `store.emit('eventName', data)` 
+ */
 class StoreManager {
 
     constructor() {
@@ -30,10 +38,14 @@ class StoreManager {
         // Store emitter callback
         this.emitters[event].push(callback);
         // Execute callback  if exist data
-        if(this.data[event]){
+        if (this.data[event]) {
             callback(this.data[event]);
         }
         //  Return data anyway
+        return this.data[event];
+    }
+
+    getStore = (event) => {
         return this.data[event];
     }
 
@@ -42,6 +54,7 @@ class StoreManager {
     }
 }
 
-const store = new StoreManager();
-
-export default store;
+/**
+ *  Export the instance of StoreManager
+ */  
+export default  new StoreManager();
