@@ -43,7 +43,6 @@ class MovieListItem extends Component {
             })
     }
 
-
     handleCardClick = (e) => {
         this.props.onMovieSelect(this.props.movie, this.getOffset(e.currentTarget));
     }
