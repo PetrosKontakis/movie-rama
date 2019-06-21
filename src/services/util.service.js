@@ -78,7 +78,38 @@ export const getMatchingGroups = (endPoint) => {
     return matchingGroups;
 };
 
+/**
+ * 
+ * @param {*} endPoint 
+ * @param {*} params 
+ */
+export const getUrlExtension = (endPoint, params) => {
+    //  Get parameters from endpoint that match to template {test}
+    const matchingGroups = getMatchingGroups(endPoint);
 
+    matchingGroups.forEach((group) => {
+        //  check if template parameters exist on params object input 
+        if (params[group.param] != null) {
+            //  Change endpoint template with the parameter actual value
+            endPoint = endPoint.replace(group.stringToReplace, params[group.param]);
+            //  Remove it for params object
+            delete params[group.param]
+            //  console.log(`Parameter: ${group.param} exist on template endpoint: ${endPoint}`)
+        }
+        else {
+            // there is no param pass mapped with endpoint string 
+            // remove place holder from endpoint
+            endPoint = endPoint.replace('/' + group.stringToReplace, '');
+        }
+    });
+
+    // Convert object parameters to string
+    let urlParameters = getParamsAsString(params);
+
+    urlParameters = urlParameters ? '?' + urlParameters : '';
+
+    return endPoint + urlParameters;
+}
 
 /**
  * Generic http call
@@ -100,33 +131,12 @@ export const genericHttpCall = (endPoint, params = {}, options = {}) => {
         fetchOpt['signal'] = signal;
     }
 
-    //  Get parameters from endpoint that match to template {test}
-    const matchingGroups = getMatchingGroups(endPoint);
-
-    matchingGroups.forEach((group) => {
-        //  check if template parameters exist on params object input 
-        if (params[group.param]) {
-            //  Change endpoint template with the parameter actual value
-            endPoint = endPoint.replace(group.stringToReplace, params[group.param]);
-            //  Remove it for params object
-            delete params[group.param]
-            //  console.log(`Parameter: ${group.param} exist on template endpoint: ${endPoint}`)
-        }
-        else {
-            //return promise rejection 
-            return new Promise((resolve, reject) => {
-                reject({ error: `Error: invalid request | parameter: '${group.param}' is required on request: ${endPoint}` });
-            })
-        }
-    });
-
-
     // Add api_key parameter
     params['api_key'] = THE_MOVIE_DB_API_KEY;
-    // Convert object parameters to string
-    const urlParameters = getParamsAsString(params);
+    // Get url ext
+    const apiUrl = API_ROOT + getUrlExtension(endPoint, params);
 
-    return fetch(`${API_ROOT}${endPoint}?${urlParameters}`, fetchOpt)
+    return fetch(apiUrl, fetchOpt)
         .then(response => response.json())
         .catch(error => {
             //  if error is cancel request by user sent to 

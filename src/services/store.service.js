@@ -51,6 +51,7 @@ class StoreManager {
 
     destroyStore = (event) => {
         delete this.emitters[event];
+        delete this.data[event];
     }
 }
 
